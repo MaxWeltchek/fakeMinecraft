@@ -1,5 +1,5 @@
 public class Cube extends Shapes{
-    private int[][] faces;
+    private final int[][] faces;
     public Cube(Points[] vertices) {
         super(vertices);
         faces = new int[][] {
