@@ -30,6 +30,32 @@ public class KeyboardHandling implements KeyListener {
             Main.swap = true;
             Main.inFocus = (Main.inFocus + 1) % Main.numScreens;
         }
+        //rotation debug
+        else if (e.getKeyChar() == 't') {
+            Main.zRotation += Math.PI / 12.0;
+        } else if (e.getKeyChar() == 'y') {
+            Main.zRotation -= Math.PI / 12.0;
+        }
+        //movement logic
+        else if (e.getKeyChar() == 'w') {
+            Camera.calculateMovement(0);
+            Main.updatePosition = true;
+        } else if (e.getKeyChar() == 's') {
+            Camera.calculateMovement(Math.PI);
+            Main.updatePosition = true;
+        } else if (e.getKeyChar() == 'a') {
+            Camera.calculateMovement(Math.PI/2.0);
+            Main.updatePosition = true;
+        } else if (e.getKeyChar() == 'd') {
+            Camera.calculateMovement(Math.PI/-2.0);
+            Main.updatePosition = true;
+        } else if (e.getKeyChar() == 'z') {
+            Camera.setCoordinates(Camera.getCoordinates()[0], Camera.getCoordinates()[1] - cameraMoveDist, Camera.getCoordinates()[2]);
+            Main.updatePosition = true;
+        } else if (e.getKeyChar() == KeyEvent.VK_SPACE) {
+            Camera.setCoordinates(Camera.getCoordinates()[0], Camera.getCoordinates()[1] + cameraMoveDist, Camera.getCoordinates()[2]);
+            Main.updatePosition = true;
+        }
     }
 
     @Override
