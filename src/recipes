@@ -1,0 +1,7 @@
+diamond_sword,empty,diamond,empty,empty,diamond,empty,empty,stick,empty,1
+iron_block,iron_ingot,iron_ingot,iron_ingot,iron_ingot,iron_ingot,iron_ingot,iron_ingot,iron_ingot,iron_ingot,1
+iron_ingot,empty,empty,empty,empty,iron_block,empty,empty,empty,empty,9
+diamond_chestplate,diamond,empty,diamond,diamond,diamond,diamond,diamond,diamond,diamond,1
+grass_block_side,empty,grass,empty,empty,dirt,empty,empty,empty,empty,1
+stick,empty,empty,empty,empty,oak_planks,empty,empty,oak_planks,empty,2
+oak_planks,empty,empty,empty,empty,oak_log,empty,empty,empty,empty,4
