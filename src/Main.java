@@ -44,12 +44,20 @@ public class Main {
     public static int[] fakeMouseCoords;
     public static final int circleRadius = 4;
     public static double zRotation = 0;
-    public static boolean updatePosition = true;
     public static boolean panicFlag = false;
     //0 is world, 1 is craftingInv
     public static int inFocus = 0;
     public static final int numScreens = 2;
     public static volatile boolean swap = false;
+    public static final int cameraMoveDist = 15;
+
+    //movement variables
+    public static boolean moveForward;
+    public static boolean moveLeft;
+    public static boolean moveBack;
+    public static boolean moveRight;
+    public static boolean moveUp;
+    public static boolean moveDown;
 
     public static Mesh cube;
     public static Mesh pyramid;
@@ -265,6 +273,32 @@ public class Main {
                         //sets rotation
                         cube.updatePositionBasedOnCamera(Camera.getLocation());
                         groundGrid.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
+
+                        //movement
+                        Vector[] movementVectors = new Vector[6];
+                        Vector totalMovementVector = new Vector(0,0,0);
+                        if (moveForward) {
+                            movementVectors[0] = Camera.calculateMovementVector(0);
+                        }
+                        if (moveLeft) {
+                            movementVectors[1] = Camera.calculateMovementVector(Math.PI/2.0);
+                        }
+                        if (moveBack) {
+                            movementVectors[2] = Camera.calculateMovementVector(Math.PI);
+                        }
+                        if (moveRight) {
+                            movementVectors[3] = Camera.calculateMovementVector(Math.PI/-2.0);
+                        }
+                        if (moveUp) {
+                            movementVectors[4] = new Vector(0, cameraMoveDist, 0);
+                        }
+                        if (moveDown) {
+                            movementVectors[5] = new Vector(0, -cameraMoveDist, 0);
+                        }
+                        totalMovementVector = Vector.addVectors(movementVectors);
+                        totalMovementVector.truncate(cameraMoveDist);
+                        Camera.updatePosition(totalMovementVector);
+                        System.out.println(totalMovementVector);
 
                         if (!panicFlag) {
                             mouseListener.updateFakeMousePosition(mouseMover, canvas);

@@ -38,23 +38,17 @@ public class KeyboardHandling implements KeyListener {
         }
         //movement logic
         else if (e.getKeyChar() == 'w') {
-            Camera.calculateMovement(0);
-            Main.updatePosition = true;
+            Main.moveForward = true;
         } else if (e.getKeyChar() == 's') {
-            Camera.calculateMovement(Math.PI);
-            Main.updatePosition = true;
+            Main.moveBack = true;
         } else if (e.getKeyChar() == 'a') {
-            Camera.calculateMovement(Math.PI/2.0);
-            Main.updatePosition = true;
+            Main.moveLeft = true;
         } else if (e.getKeyChar() == 'd') {
-            Camera.calculateMovement(Math.PI/-2.0);
-            Main.updatePosition = true;
+            Main.moveRight = true;
         } else if (e.getKeyChar() == 'z') {
-            Camera.setCoordinates(Camera.getCoordinates()[0], Camera.getCoordinates()[1] - cameraMoveDist, Camera.getCoordinates()[2]);
-            Main.updatePosition = true;
+            Main.moveDown = true;
         } else if (e.getKeyChar() == KeyEvent.VK_SPACE) {
-            Camera.setCoordinates(Camera.getCoordinates()[0], Camera.getCoordinates()[1] + cameraMoveDist, Camera.getCoordinates()[2]);
-            Main.updatePosition = true;
+            Main.moveUp = true;
         }
     }
 
@@ -63,6 +57,18 @@ public class KeyboardHandling implements KeyListener {
         //shift up
         if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
             Main.shiftPressed = false;
+        } else if (e.getKeyChar() == 'w') {
+            Main.moveForward = false;
+        } else if (e.getKeyChar() == 's') {
+            Main.moveBack = false;
+        } else if (e.getKeyChar() == 'a') {
+            Main.moveLeft = false;
+        } else if (e.getKeyChar() == 'd') {
+            Main.moveRight = false;
+        } else if (e.getKeyChar() == 'z') {
+            Main.moveDown = false;
+        } else if (e.getKeyChar() == KeyEvent.VK_SPACE) {
+            Main.moveUp = false;
         }
     }
 }

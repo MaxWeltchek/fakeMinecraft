@@ -51,4 +51,19 @@ public class Camera {
         coordinates[0] -= dx;
         coordinates[2] += dz;
     }
+
+    public static Vector calculateMovementVector(double spin) {
+        double totalAngle = rotation[1] + spin;
+
+        double dx = Math.sin(totalAngle) * KeyboardHandling.cameraMoveDist;
+        double dz = Math.cos(totalAngle) * KeyboardHandling.cameraMoveDist;
+
+        return new Vector(-dx, 0, dz);
+    }
+
+    public static void updatePosition(Vector movement) {
+        coordinates[0] += movement.getDirection()[0];
+        coordinates[1] += movement.getDirection()[1];
+        coordinates[2] += movement.getDirection()[2];
+    }
 }
