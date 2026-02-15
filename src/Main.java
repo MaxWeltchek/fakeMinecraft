@@ -281,7 +281,7 @@ public class Main {
                         groundGrid.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
 
                         //movement
-                        Vector[] movementVectors = new Vector[6];
+                        Vector[] movementVectors = new Vector[4];
                         Vector jumpVector = null;
                         Vector totalMovementVector = new Vector(0,0,0);
                         if (moveForward) {
@@ -296,12 +296,6 @@ public class Main {
                         if (moveRight) {
                             movementVectors[3] = Camera.calculateMovementVector(Math.PI/-2.0);
                         }
-//                        if (moveUp) {
-//                            movementVectors[4] = new Vector(0, cameraMoveDist, 0);
-//                        }
-//                        if (moveDown) {
-//                            movementVectors[5] = new Vector(0, -cameraMoveDist, 0);
-//                        }
 
                         if (jumping) {
                             if (jumpFrame/30 == 0) {

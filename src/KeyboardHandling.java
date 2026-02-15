@@ -45,10 +45,7 @@ public class KeyboardHandling implements KeyListener {
             Main.moveLeft = true;
         } else if (e.getKeyChar() == 'd') {
             Main.moveRight = true;
-        } else if (e.getKeyChar() == 'z') {
-            Main.moveDown = true;
         } else if (e.getKeyChar() == KeyEvent.VK_SPACE) {
-            Main.moveUp = true;
             if (!Main.jumping) {
                 Main.jumping = true;
                 }
@@ -68,10 +65,6 @@ public class KeyboardHandling implements KeyListener {
             Main.moveLeft = false;
         } else if (e.getKeyChar() == 'd') {
             Main.moveRight = false;
-        } else if (e.getKeyChar() == 'z') {
-            Main.moveDown = false;
-        } else if (e.getKeyChar() == KeyEvent.VK_SPACE) {
-            Main.moveUp = false;
         }
     }
 }
