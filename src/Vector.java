@@ -24,6 +24,12 @@ public class Vector {
         return new Vector(x,y,z);
     }
 
+    public void add(Vector vector) {
+        direction[0] += vector.getDirection()[0];
+        direction[1] += vector.getDirection()[1];
+        direction[2] += vector.getDirection()[2];
+    }
+
     public void truncate(double length) {
         double magnitude = Math.sqrt(Math.pow(direction[0],2) + Math.pow(direction[1],2) + Math.pow(direction[2],2));
         if (magnitude == 0) {

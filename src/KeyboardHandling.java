@@ -49,6 +49,9 @@ public class KeyboardHandling implements KeyListener {
             Main.moveDown = true;
         } else if (e.getKeyChar() == KeyEvent.VK_SPACE) {
             Main.moveUp = true;
+            if (!Main.jumping) {
+                Main.jumping = true;
+                }
         }
     }
 

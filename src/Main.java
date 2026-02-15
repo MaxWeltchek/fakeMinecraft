@@ -47,9 +47,14 @@ public class Main {
     public static boolean panicFlag = false;
     //0 is world, 1 is craftingInv
     public static int inFocus = 0;
+    public static boolean jumping = false;
+    public static int jumpFrame = 0;
+    public static final int totalJumpFrames = 59;
     public static final int numScreens = 2;
     public static volatile boolean swap = false;
-    public static final int cameraMoveDist = 15;
+    public static final int cameraMoveDist = 5;
+    public static final double jumpDist = 10;
+
 
     //movement variables
     public static boolean moveForward;
@@ -254,6 +259,7 @@ public class Main {
                     break;
                 }
 
+                // ~100fps hard cap, likely lower
                 Thread.sleep(10);
             }
             //world loop
@@ -276,6 +282,7 @@ public class Main {
 
                         //movement
                         Vector[] movementVectors = new Vector[6];
+                        Vector jumpVector = null;
                         Vector totalMovementVector = new Vector(0,0,0);
                         if (moveForward) {
                             movementVectors[0] = Camera.calculateMovementVector(0);
@@ -289,14 +296,32 @@ public class Main {
                         if (moveRight) {
                             movementVectors[3] = Camera.calculateMovementVector(Math.PI/-2.0);
                         }
-                        if (moveUp) {
-                            movementVectors[4] = new Vector(0, cameraMoveDist, 0);
+//                        if (moveUp) {
+//                            movementVectors[4] = new Vector(0, cameraMoveDist, 0);
+//                        }
+//                        if (moveDown) {
+//                            movementVectors[5] = new Vector(0, -cameraMoveDist, 0);
+//                        }
+
+                        if (jumping) {
+                            if (jumpFrame/30 == 0) {
+                                jumpVector = new Vector(0, jumpDist/((totalJumpFrames+1)/2.0), 0);
+                                jumpFrame++;
+                            } else if (jumpFrame == totalJumpFrames) {
+                                jumpVector = new Vector(0, -jumpDist/((totalJumpFrames+1)/2.0), 0);
+                                jumping = false;
+                                jumpFrame = 0;
+                            } else if (jumpFrame/30 == 1) {
+                                jumpVector = new Vector(0, -jumpDist/((totalJumpFrames+1)/2.0), 0);
+                                jumpFrame++;
+                            }
                         }
-                        if (moveDown) {
-                            movementVectors[5] = new Vector(0, -cameraMoveDist, 0);
-                        }
+
                         totalMovementVector = Vector.addVectors(movementVectors);
                         totalMovementVector.truncate(cameraMoveDist);
+                        if (jumpVector != null) {
+                            totalMovementVector.add(jumpVector);
+                        }
                         Camera.updatePosition(totalMovementVector);
                         System.out.println(totalMovementVector);
 
@@ -312,7 +337,8 @@ public class Main {
 
                         lastTime = now;
                         //cpu overhead
-                        Thread.sleep(20);
+                        // ~100fps hard cap, likely lower
+                        Thread.sleep(10);
                     }
                 }
             }

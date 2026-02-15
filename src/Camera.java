@@ -42,6 +42,7 @@ public class Camera {
     }
 
     //localizes movement vector to be based on camera rotation instead of being locked to global axes, i.e. you move in the direction you are pointed
+    //depreciated
     public static void calculateMovement(double spin) {
         double totalAngle = rotation[1] + spin;
 
@@ -52,11 +53,13 @@ public class Camera {
         coordinates[2] += dz;
     }
 
+    //returns the results of a movement as a vector instead of applying immediately
+    //still localizes vector to be in the direction you are pointing
     public static Vector calculateMovementVector(double spin) {
         double totalAngle = rotation[1] + spin;
 
-        double dx = Math.sin(totalAngle) * KeyboardHandling.cameraMoveDist;
-        double dz = Math.cos(totalAngle) * KeyboardHandling.cameraMoveDist;
+        double dx = Math.sin(totalAngle) * Main.cameraMoveDist;
+        double dz = Math.cos(totalAngle) * Main.cameraMoveDist;
 
         return new Vector(-dx, 0, dz);
     }
