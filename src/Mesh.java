@@ -15,7 +15,7 @@ public class Mesh {
         //creates original vertices array that isn't a pointer and thus isn't updated when vertices get altered by additive rotation
         originalVertices = new Points[vertices_.length];
         for (int i = 0; i < vertices_.length; i++) {
-            double coordinates[] = vertices_[i].getCoordinates();
+            double[] coordinates = vertices_[i].getCoordinates();
             originalVertices[i] = new Points(coordinates[0], coordinates[1], coordinates[2]);
         }
         faces = faces_;

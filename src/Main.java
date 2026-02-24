@@ -54,6 +54,7 @@ public class Main {
     public static volatile boolean swap = false;
     public static final int cameraMoveDist = 5;
     public static final double jumpDist = 10;
+    private static long lastFrameTime;
 
 
     //movement variables
@@ -317,7 +318,6 @@ public class Main {
                             totalMovementVector.add(jumpVector);
                         }
                         Camera.updatePosition(totalMovementVector);
-                        System.out.println(totalMovementVector);
 
                         if (!panicFlag) {
                             mouseListener.updateFakeMousePosition(mouseMover, canvas);
@@ -330,6 +330,11 @@ public class Main {
                         }
 
                         lastTime = now;
+
+                        //fps printing
+                        System.out.println("Frame Rate: " + 1000/(System.currentTimeMillis() - lastFrameTime));
+                        lastFrameTime = System.currentTimeMillis();
+
                         //cpu overhead
                         // ~100fps hard cap, likely lower
                         Thread.sleep(10);
