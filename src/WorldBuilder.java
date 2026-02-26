@@ -2,11 +2,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class WorldBuilder {
-    public static void main(String[] args) {
-        WorldBuilder builder = new WorldBuilder();
-        System.out.println(builder.validSeed(1234567));
-    }
-
     private int seed;
 
     public WorldBuilder() {

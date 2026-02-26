@@ -66,9 +66,12 @@ public class MouseHandling implements MouseListener, MouseMotionListener {
 
             //sets new item in that cell, moves it, then clears original cell
             //unsure if this is less overhead than checking if nothing would happen in the first place (i.e. firstAvailable == nearestCell)
-            Main.inventoryCells.get(firstAvailable).setItemInSlot(Main.inventoryCells.get(nearestCell).getItemInSlot().clone());
-            Main.inventoryCells.get(firstAvailable).getItemInSlot().move(Main.inventoryCells.get(firstAvailable).getCenterCoords());
-            Main.inventoryCells.get(nearestCell).clearSlot();
+            if (Main.inventoryCells.get(nearestCell).occupied()) {
+                Main.inventoryCells.get(firstAvailable).setItemInSlot(Main.inventoryCells.get(nearestCell).getItemInSlot().clone());
+                Main.inventoryCells.get(firstAvailable).getItemInSlot().move(Main.inventoryCells.get(firstAvailable).getCenterCoords());
+                Main.inventoryCells.get(nearestCell).clearSlot();
+
+            }
             //short circuit instead of giant if case
         }
 
