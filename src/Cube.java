@@ -1,15 +1,17 @@
 public class Cube extends Shapes{
     private final int[][] faces;
+    private final Mesh mesh;
     public Cube(Points[] vertices) {
         super(vertices);
         faces = new int[][] {
-                {0, 1, 2 ,3},
-                {3, 2, 6, 7},
-                {7, 6, 5, 4},
-                {4, 5, 1, 0},
-                {0, 3, 7, 4},
-                {1, 2, 6, 5}
+                {0, 2, 3, 1},
+                {4, 5, 7, 6},
+                {0, 1, 5, 4},
+                {2, 6, 7, 3},
+                {0, 4, 6, 2},
+                {1, 3, 7, 5}
         };
+        mesh = new Mesh(vertices, faces);
     }
 
     public Cube(Points center, int radius) {
@@ -28,12 +30,17 @@ public class Cube extends Shapes{
         }
         super(vertices);
         faces = new int[][] {
-                {0, 1, 2 ,3},
-                {3, 2, 6, 7},
-                {7, 6, 5, 4},
-                {4, 5, 1, 0},
-                {0, 3, 7, 4},
-                {1, 2, 6, 5}
+                {0, 2, 3, 1},
+                {4, 5, 7, 6},
+                {0, 1, 5, 4},
+                {2, 6, 7, 3},
+                {0, 4, 6, 2},
+                {1, 3, 7, 5}
         };
+        mesh = new Mesh(vertices, faces);
+    }
+
+    public Mesh getMesh() {
+        return mesh;
     }
 }

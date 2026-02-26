@@ -110,6 +110,10 @@ public class Main {
         canvas.addKeyListener(keyListener);
         canvas.requestFocusInWindow();
 
+        WorldBuilder worldBuilder = new WorldBuilder();
+        ArrayList<Cube> blocks = new ArrayList<>();
+        worldBuilder.flatWorld(blocks);
+
         //initialize all inventory cells
         for (int[] coords : allSquareCenterCoords) {
             inventoryCells.add(new InventoryCell(coords));
@@ -272,14 +276,18 @@ public class Main {
                     if (now - lastTime >= 1) {
                         clearScreen(pen);
 
-                        draw(pen, groundGrid.getMesh());
+//                        draw(pen, groundGrid.getMesh());
+                        for (Cube cube : blocks) {
+                            draw(pen, cube.getMesh());
+                            cube.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
+                        }
 
 
                         bs.show();
 
                         //sets rotation
                         cube.updatePositionBasedOnCamera(Camera.getLocation());
-                        groundGrid.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
+//                        groundGrid.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
 
                         //movement
                         Vector[] movementVectors = new Vector[4];
@@ -332,7 +340,7 @@ public class Main {
                         lastTime = now;
 
                         //fps printing
-                        System.out.println("Frame Rate: " + 1000/(System.currentTimeMillis() - lastFrameTime));
+//                        System.out.println("Frame Rate: " + 1000/(System.currentTimeMillis() - lastFrameTime));
                         lastFrameTime = System.currentTimeMillis();
 
                         //cpu overhead

@@ -10,7 +10,7 @@ public class CommandListener {
     private volatile boolean running = false;
     private Thread listenerThread;
 
-    public void start() {
+    public void start() throws InvalidCommand{
         running = true;
 
         listenerThread = new Thread(() -> {
@@ -19,18 +19,19 @@ public class CommandListener {
             while (running) {
                 String input = scanner.nextLine();
                 String[] parsedInput = input.split(" ");
-                int quantity;
-                //if the command had 3 parts, /give, item, amount, set amount to 3rd part, if not set to 1
-                if (parsedInput.length >= 3) {
-                    quantity = Integer.parseInt(parsedInput[2]);
-                } else {
-                    quantity = 1;
-                }
-
-                //track how many items left
-                int itemsLeftToGrant = quantity;
 
                 if (parsedInput[0].equals("/give")) {
+                    //if the command had 3 parts, /give, item, amount, set amount to 3rd part, if not set to 1
+                    int quantity;
+                    if (parsedInput.length >= 3) {
+                        quantity = Integer.parseInt(parsedInput[2]);
+                    } else {
+                        quantity = 1;
+                    }
+
+                    //track how many items left
+                    int itemsLeftToGrant = quantity;
+
                     try {
                         for (int i = 0; i < 36; i++) {
                             if (!Main.inventoryCells.get(i).occupied() && itemsLeftToGrant > 0) { //if the slot is empty, and we have items left to give, give them more items in that slot
@@ -93,6 +94,22 @@ public class CommandListener {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                } else if (parsedInput[0].equals("/movecamera")) {
+                    if (parsedInput[1].equals("up")) {
+                        if (parsedInput.length > 2) {
+                            Camera.updatePosition(new Vector(0, Integer.parseInt(parsedInput[2]), 0));
+                        } else {
+                            Camera.updatePosition(new Vector(0, 30, 0));
+                        }
+                    } else if (parsedInput[1].equals("down")) {
+                        if (parsedInput.length > 2) {
+                            Camera.updatePosition(new Vector(0, -Integer.parseInt(parsedInput[2]), 0));
+                        } else {
+                            Camera.updatePosition(new Vector(0, -30, 0));
+                        }
+                    } else {
+                        throw new InvalidCommand();
+                    }
                 } else {
                     System.out.println("Invalid command, type \"/help\" for commands");
                 }
@@ -115,6 +132,8 @@ public class CommandListener {
         System.out.println("/help (this menu)");
         System.out.println("/give item [quantity]");
         System.out.println("/clear [item]");
+        System.out.println("/movecamera (up/down) [distance]");
+
     }
 
     private void addRecipe(String regex) throws NoItemFoundException, IOException {

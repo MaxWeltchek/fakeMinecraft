@@ -19,12 +19,12 @@ public class Grid {
         int[][] faces = new int[numSquaresPerLine_ * numSquaresPerLine_][4];
         for (int i = 0; i < numSquaresPerLine_ - 1; i++) {
             for (int j = 0; j < numSquaresPerLine_; j++) {
-                int topleft = i * numVerticesPerLine + j;
+                int topLeft = i * numVerticesPerLine + j;
                 faces[i * numSquaresPerLine_ + j] = new int[]{
-                        topleft,
-                        topleft + 1,
-                        topleft + 1 + numVerticesPerLine,
-                        topleft + numVerticesPerLine
+                        topLeft,
+                        topLeft + 1,
+                        topLeft + 1 + numVerticesPerLine,
+                        topLeft + numVerticesPerLine
                 };            }
         }
 
