@@ -17,22 +17,22 @@ public class CommandListener {
             Scanner scanner = new Scanner(System.in);
 
             while (running) {
-                String input = scanner.nextLine();
-                String[] parsedInput = input.split(" ");
+                try {
+                    String input = scanner.nextLine();
+                    String[] parsedInput = input.split(" ");
 
-                if (parsedInput[0].equals("/give")) {
-                    //if the command had 3 parts, /give, item, amount, set amount to 3rd part, if not set to 1
-                    int quantity;
-                    if (parsedInput.length >= 3) {
-                        quantity = Integer.parseInt(parsedInput[2]);
-                    } else {
-                        quantity = 1;
-                    }
+                    if (parsedInput[0].equals("/give")) {
+                        //if the command had 3 parts, /give, item, amount, set amount to 3rd part, if not set to 1
+                        int quantity;
+                        if (parsedInput.length >= 3) {
+                            quantity = Integer.parseInt(parsedInput[2]);
+                        } else {
+                            quantity = 1;
+                        }
 
-                    //track how many items left
-                    int itemsLeftToGrant = quantity;
+                        //track how many items left
+                        int itemsLeftToGrant = quantity;
 
-                    try {
                         for (int i = 0; i < 36; i++) {
                             if (!Main.inventoryCells.get(i).occupied() && itemsLeftToGrant > 0) { //if the slot is empty, and we have items left to give, give them more items in that slot
                                 Main.inventoryCells.get(i).setItemInSlot(new Item(parsedInput[1], Main.inventoryCells.get(i).getCenterCoords(), (ItemRegistry.isStackable((parsedInput[1])) ? Math.min(itemsLeftToGrant, 64) : 1), ItemRegistry.isStackable(parsedInput[1])));
@@ -54,64 +54,71 @@ public class CommandListener {
                         } else {
                             System.out.println("Gave " + quantity + " " + parsedInput[1].split("_")[0] + (parsedInput[1].split("_").length > 1 ? " " + parsedInput[1].split("_")[1] : "") + (quantity > 1 ? "s" : ""));
                         }
-                    } catch (NoItemFoundException e) {
-                        System.out.println(e.getMessage());
-                    }
-                } else if (parsedInput[0].equals("/clear") && parsedInput.length == 1) { //if it's a clear command without a specific item argument
-                    //track #of cleared items
-                    int amountOfItemsCleared = 0;
-                    for (int i = 0; i < 36; i++) {
-                        //ternery to fix null pointer with short-circuiting
-                        amountOfItemsCleared += (Main.inventoryCells.get(i).occupied() ? Main.inventoryCells.get(i).getItemInSlot().getAmount() : 0);
-                        Main.inventoryCells.get(i).clearSlot();
-                    }
-                    //send cleared message
-                    System.out.println("Cleared " + amountOfItemsCleared + " item" + (amountOfItemsCleared != 1 ? "s" : ""));
-                } else if (parsedInput[0].equals("/clear") && parsedInput.length == 2) { //same thing but with a specific item argument
-                    int amountOfItemsCleared = 0;
-                    for (int i = 0; i < 36; i++) {
-                        if (Main.inventoryCells.get(i).occupied() && Main.inventoryCells.get(i).getItemInSlot().getLore().equals(parsedInput[1])) {
-                            amountOfItemsCleared += Main.inventoryCells.get(i).getItemInSlot().getAmount();
+
+                    } else if (parsedInput[0].equals("/clear") && parsedInput.length == 1) { //if it's a clear command without a specific item argument
+                        //track #of cleared items
+                        int amountOfItemsCleared = 0;
+                        for (int i = 0; i < 36; i++) {
+                            //ternery to fix null pointer with short-circuiting
+                            amountOfItemsCleared += (Main.inventoryCells.get(i).occupied() ? Main.inventoryCells.get(i).getItemInSlot().getAmount() : 0);
                             Main.inventoryCells.get(i).clearSlot();
                         }
-                    }
-                    //build the cleared message to include lore, for loop is to handle multiple cases of lore1_lore2_lore3 etc
-                    String[] parsedItemLore = parsedInput[1].split("_");
-                    StringBuilder clearedMessage = new StringBuilder("Cleared " + amountOfItemsCleared);
-                    for (String loreChunk : parsedItemLore) {
-                        clearedMessage.append(" ").append(loreChunk);
-                    }
-                    //add plural if not 1
-                    clearedMessage.append((amountOfItemsCleared != 0 ? "s" : ""));
-                    System.out.println(clearedMessage);
-                } else if (parsedInput[0].equals("/help")) {
-                    helpMessage();
-                } else if (parsedInput[0].equals("/addrecipe")){
-                    String recipeRegex = parsedInput[1];
-                    try {
-                        addRecipe(recipeRegex);
-                        RecipeList.updateRecipeList();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                } else if (parsedInput[0].equals("/movecamera")) {
-                    if (parsedInput[1].equals("up")) {
-                        if (parsedInput.length > 2) {
-                            Camera.updatePosition(new Vector(0, Integer.parseInt(parsedInput[2]), 0));
-                        } else {
-                            Camera.updatePosition(new Vector(0, 30, 0));
+                        //send cleared message
+                        System.out.println("Cleared " + amountOfItemsCleared + " item" + (amountOfItemsCleared != 1 ? "s" : ""));
+                    } else if (parsedInput[0].equals("/clear") && parsedInput.length == 2) { //same thing but with a specific item argument
+                        int amountOfItemsCleared = 0;
+                        for (int i = 0; i < 36; i++) {
+                            if (Main.inventoryCells.get(i).occupied() && Main.inventoryCells.get(i).getItemInSlot().getLore().equals(parsedInput[1])) {
+                                amountOfItemsCleared += Main.inventoryCells.get(i).getItemInSlot().getAmount();
+                                Main.inventoryCells.get(i).clearSlot();
+                            }
                         }
-                    } else if (parsedInput[1].equals("down")) {
-                        if (parsedInput.length > 2) {
-                            Camera.updatePosition(new Vector(0, -Integer.parseInt(parsedInput[2]), 0));
-                        } else {
-                            Camera.updatePosition(new Vector(0, -30, 0));
+                        //build the cleared message to include lore, for loop is to handle multiple cases of lore1_lore2_lore3 etc
+                        String[] parsedItemLore = parsedInput[1].split("_");
+                        StringBuilder clearedMessage = new StringBuilder("Cleared " + amountOfItemsCleared);
+                        for (String loreChunk : parsedItemLore) {
+                            clearedMessage.append(" ").append(loreChunk);
+                        }
+                        //add plural if not 1
+                        clearedMessage.append((amountOfItemsCleared != 0 ? "s" : ""));
+                        System.out.println(clearedMessage);
+                    } else if (parsedInput[0].equals("/help")) {
+                        helpMessage();
+                    } else if (parsedInput[0].equals("/addrecipe")) {
+                        String recipeRegex = parsedInput[1];
+                        try {
+                            addRecipe(recipeRegex);
+                            RecipeList.updateRecipeList();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (parsedInput[0].equals("/movecamera")) {
+                        try {
+                            if (parsedInput[1].equals("up")) {
+                                if (parsedInput.length > 2) {
+                                    Camera.updatePosition(new Vector(0, Integer.parseInt(parsedInput[2]), 0));
+                                } else {
+                                    Camera.updatePosition(new Vector(0, 30, 0));
+                                }
+                            } else if (parsedInput[1].equals("down")) {
+                                if (parsedInput.length > 2) {
+                                    Camera.updatePosition(new Vector(0, -Integer.parseInt(parsedInput[2]), 0));
+                                } else {
+                                    Camera.updatePosition(new Vector(0, -30, 0));
+                                }
+                            } else {
+                                throw new InvalidCommand("Valid move camera arguments are \"up\" or \"down\"");
+                            }
+                        } catch (NumberFormatException e) {
+                            throw new InvalidCommand("Not a number");
                         }
                     } else {
                         throw new InvalidCommand();
                     }
-                } else {
-                    System.out.println("Invalid command, type \"/help\" for commands");
+                } catch (InvalidCommand | NoItemFoundException e) {
+                    System.out.println(e.getMessage());
+                } catch (Exception e) {
+                    System.out.println("Command failed " + e.getMessage());
                 }
             }
             scanner.close();
