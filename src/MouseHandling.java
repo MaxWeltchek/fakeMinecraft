@@ -118,7 +118,7 @@ public class MouseHandling implements MouseListener, MouseMotionListener {
                 Main.craftingGridUpdated = true;
             } //or if we are holding something we can't click on crafting output slot
             else if (bestPoint == 45) {
-                if (Main.heldItem.getLore().equals(Main.inventoryCells.get(45).getItemInSlot().getLore())) {
+                if (Main.inventoryCells.get(45).occupied() && Main.heldItem.getLore().equals(Main.inventoryCells.get(45).getItemInSlot().getLore())) {
                     Main.heldItem.setAmount(Main.heldItem.getAmount() + Main.inventoryCells.get(45).getItemInSlot().getAmount());
                     Main.decrementCraftingSlots();
                     Main.craftingGridUpdated = true;
