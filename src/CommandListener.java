@@ -50,7 +50,7 @@ public class CommandListener {
                             }
                         }
                         if (itemsLeftToGrant > 0) { //if not all were given (inv full), say how many were given
-                            System.out.println("Failed to grant all items, gave " + (quantity - itemsLeftToGrant) + " " + parsedInput[1].split("_")[0] + (parsedInput[1].split("_").length > 0 ? " " + parsedInput[1].split("_")[1] : "") + (quantity > 1 ? "s" : "") + " instead");
+                            System.out.println("Failed to grant all items, gave " + (quantity - itemsLeftToGrant) + " " + parsedInput[1].split("_")[0] + (parsedInput[1].split("_").length > 1 ? " " + parsedInput[1].split("_")[1] : "") + (quantity > 1 ? "s" : "") + " instead");
                         } else {
                             System.out.println("Gave " + quantity + " " + parsedInput[1].split("_")[0] + (parsedInput[1].split("_").length > 1 ? " " + parsedInput[1].split("_")[1] : "") + (quantity > 1 ? "s" : ""));
                         }
