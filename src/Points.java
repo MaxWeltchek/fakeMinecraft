@@ -1,5 +1,5 @@
 public class Points {
-    public static final double NEAR_CLIP_Z = 10.0;
+    public static final double NEAR_CLIP_Z = 0.01;
     //contains xyz coordinates for a given point
     private double[] coordinates;
 
