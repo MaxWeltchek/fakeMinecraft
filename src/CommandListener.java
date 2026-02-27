@@ -22,6 +22,9 @@ public class CommandListener {
                     String[] parsedInput = input.split(" ");
 
                     if (parsedInput[0].equals("/give")) {
+                        if (parsedInput.length == 1) {
+                            throw new InvalidCommand("Missing argument at \"/give ____\" <--");
+                        }
                         //if the command had 3 parts, /give, item, amount, set amount to 3rd part, if not set to 1
                         int quantity;
                         if (parsedInput.length >= 3) {
@@ -50,7 +53,7 @@ public class CommandListener {
                             }
                         }
                         if (itemsLeftToGrant > 0) { //if not all were given (inv full), say how many were given
-                            System.out.println("Failed to grant all items, gave " + (quantity - itemsLeftToGrant) + " " + parsedInput[1].split("_")[0] + (parsedInput[1].split("_").length > 1 ? " " + parsedInput[1].split("_")[1] : "") + (quantity > 1 ? "s" : "") + " instead");
+                            throw new InventoryFullException(parsedInput[1], quantity - itemsLeftToGrant);
                         } else {
                             System.out.println("Gave " + quantity + " " + parsedInput[1].split("_")[0] + (parsedInput[1].split("_").length > 1 ? " " + parsedInput[1].split("_")[1] : "") + (quantity > 1 ? "s" : ""));
                         }
@@ -112,10 +115,16 @@ public class CommandListener {
                         } catch (NumberFormatException e) {
                             throw new InvalidCommand("Not a number");
                         }
+                    } else if (parsedInput[0].equals("/resetcamera")) {
+                        try {
+                            Camera.resetPos();
+                        } catch (Exception e) {
+                            throw new InvalidCommand();
+                        }
                     } else {
                         throw new InvalidCommand();
                     }
-                } catch (InvalidCommand | NoItemFoundException e) {
+                } catch (InvalidCommand | NoItemFoundException | InventoryFullException e) {
                     System.out.println(e.getMessage());
                 } catch (Exception e) {
                     System.out.println("Command failed " + e.getMessage());
@@ -140,7 +149,7 @@ public class CommandListener {
         System.out.println("/give item [quantity]");
         System.out.println("/clear [item]");
         System.out.println("/movecamera (up/down) [distance]");
-
+        System.out.println("/resetcamera");
     }
 
     private void addRecipe(String regex) throws NoItemFoundException, IOException {

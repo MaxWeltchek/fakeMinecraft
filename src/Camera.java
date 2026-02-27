@@ -41,6 +41,15 @@ public class Camera {
         return new Vector(-dx, 0, dz);
     }
 
+    public static void resetPos() {
+        coordinates[0] = 0;
+        coordinates[1] = 0;
+        coordinates[2] = 0;
+        rotation[0] = 0;
+        rotation[1] = 0;
+        rotation[2] = Math.PI;
+    }
+
     public static void updatePosition(Vector movement) {
         coordinates[0] += movement.getDirection()[0];
         coordinates[1] += movement.getDirection()[1];
