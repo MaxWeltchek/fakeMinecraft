@@ -52,7 +52,7 @@ public class Main {
     public static final int totalJumpFrames = 59;
     public static final int numScreens = 2;
     public static volatile boolean swap = false;
-    public static final int cameraMoveDist = 5;
+    public static final int cameraMoveDist = 1;
     public static final double jumpDist = 10;
     private static long lastFrameTime;
 
@@ -376,19 +376,33 @@ public class Main {
     public static void draw(Graphics pen, Mesh object) {
         for (int i = 0; i < object.getFaces().length; i++) {
             for (int j = 0 ; j < object.getFaces()[i].length-1; j++) {
-                int[] tempCoordinates1 = object.getVertices()[object.getFaces()[i][j]].castToXY();
-                int[] tempCoordinates2 = object.getVertices()[object.getFaces()[i][j+1]].castToXY();
+                Points point1 = object.getVertices()[object.getFaces()[i][j]];
+                Points point2 = object.getVertices()[object.getFaces()[i][j + 1]];
+                if (point1.getCoordinates()[2] <= Points.NEAR_CLIP_Z || point2.getCoordinates()[2] <= Points.NEAR_CLIP_Z) {
+                    continue;
+                }
+                int[] tempCoordinates1 = point1.castToXY();
+                int[] tempCoordinates2 = point2.castToXY();
                 drawLine(pen, tempCoordinates1, tempCoordinates2);
 
             }
-            drawLine(pen, object.getVertices()[object.getFaces()[i][0]].castToXY(), object.getVertices()[object.getFaces()[i][object.getFaces()[i].length-1]].castToXY());
+            Points closingPoint1 = object.getVertices()[object.getFaces()[i][0]];
+            Points closingPoint2 = object.getVertices()[object.getFaces()[i][object.getFaces()[i].length - 1]];
+            if (closingPoint1.getCoordinates()[2] > Points.NEAR_CLIP_Z && closingPoint2.getCoordinates()[2] > Points.NEAR_CLIP_Z) {
+                drawLine(pen, closingPoint1.castToXY(), closingPoint2.castToXY());
+            }
         }
     }
 
     //draws a single vertex
     public static void drawPoint(Graphics pen, Mesh object) {
-        for (int i = 0; i < object.getVertices().length; i++)
-            pen.fillOval(object.getVertices()[i].castToXY()[0] - circleRadius, object.getVertices()[i].castToXY()[1] - circleRadius,circleRadius*2, circleRadius*2);
+        for (int i = 0; i < object.getVertices().length; i++) {
+            if (object.getVertices()[i].getCoordinates()[2] <= Points.NEAR_CLIP_Z) {
+                continue;
+            }
+            int[] projectedPoint = object.getVertices()[i].castToXY();
+            pen.fillOval(projectedPoint[0] - circleRadius, projectedPoint[1] - circleRadius, circleRadius * 2, circleRadius * 2);
+        }
     }
 
     //draws a line between two points

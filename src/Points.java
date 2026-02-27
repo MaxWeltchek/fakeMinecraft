@@ -1,4 +1,5 @@
 public class Points {
+    public static final double NEAR_CLIP_Z = 10.0;
     //contains xyz coordinates for a given point
     private double[] coordinates;
 
@@ -23,7 +24,7 @@ public class Points {
         instead of calculating clipping at render time, calculate if an object should be clipped before drawing, skip that vertex, vertex
         pair, or line if it should be to improve performance
          */
-        if (coordinates[2] <= 10) {
+        if (coordinates[2] <= NEAR_CLIP_Z) {
             XYCoordinates[0] = Double.MAX_VALUE;
             XYCoordinates[1] = Double.MAX_VALUE;
             return XYCoordinates;
