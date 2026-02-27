@@ -2,15 +2,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class WorldBuilder {
-    private int seed;
 
     public WorldBuilder() {
         Random random = new Random();
-        String temp = "";
+        StringBuilder temp = new StringBuilder();
         for (int i = 0; i < 8; i++) {
-            temp += (random.nextInt(9) + 1);
+            temp.append(random.nextInt(9) + 1);
         }
-        int seed = Integer.parseInt(temp);
+        int seed = Integer.parseInt(temp.toString());
     }
 
     public boolean validSeed(int seed) {
