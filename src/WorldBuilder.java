@@ -10,7 +10,7 @@ public class WorldBuilder {
         for (int i = 0; i < 8; i++) {
             temp += (random.nextInt(9) + 1);
         }
-        seed = Integer.parseInt(temp);
+        int seed = Integer.parseInt(temp);
     }
 
     public boolean validSeed(int seed) {
