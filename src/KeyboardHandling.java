@@ -3,7 +3,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class KeyboardHandling implements KeyListener {
-    public static int cameraMoveDist = 30;
     @Override
     public void keyTyped(KeyEvent e) {
 
