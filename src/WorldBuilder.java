@@ -24,7 +24,7 @@ public class WorldBuilder {
     public void flatWorld(ArrayList<Cube> cubes) {
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                cubes.add(new Cube(new Points(i*10, 0, j*10), 5));
+                cubes.add(new Cube(new Points(i*10, -7, j*10), 5));
             }
         }
     }
