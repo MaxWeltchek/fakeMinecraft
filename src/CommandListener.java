@@ -32,6 +32,9 @@ public class CommandListener {
                         } else {
                             quantity = 1;
                         }
+                        if (quantity <= 0) {
+                            throw new InvalidCommand("Invalid quantity");
+                        }
 
                         //track how many items left
                         int itemsLeftToGrant = quantity;
