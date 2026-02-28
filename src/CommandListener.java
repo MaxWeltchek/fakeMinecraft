@@ -113,7 +113,12 @@ public class CommandListener {
                                     Camera.updatePosition(new Vector(0, -30, 0));
                                 }
                             } else {
-                                throw new InvalidCommand("Valid move camera arguments are \"up\" or \"down\"");
+                                try {
+                                    Integer.parseInt(parsedInput[1]);
+                                    throw new InvalidCommand("Missing argument at \"/movecamera ____ " + parsedInput[1] + "\"");
+                                } catch (NumberFormatException e) {
+                                    throw new InvalidCommand("Valid move camera arguments are \"up\" or \"down\"");
+                                }
                             }
                         } catch (NumberFormatException e) {
                             throw new InvalidCommand("Not a number");
