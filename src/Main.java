@@ -261,7 +261,7 @@ public class Main {
 
                 if (swap) {
                     swap = false;
-                    break;
+                    continue;
                 }
 
                 // ~100fps hard cap, likely lower
@@ -270,83 +270,81 @@ public class Main {
             //world loop
             else if (inFocus == 0) {
                 long lastTime = System.currentTimeMillis();
-                while (true) {
-                    long now = System.currentTimeMillis();
-                    // rudimentary frame limiting
-                    if (now - lastTime >= 1) {
-                        clearScreen(pen);
+                long now = System.currentTimeMillis();
+                // rudimentary frame limiting
+                if (now - lastTime >= 1) {
+                    clearScreen(pen);
 
 //                        draw(pen, groundGrid.getMesh());
-                        for (Cube cube : blocks) {
-                            draw(pen, cube.getMesh());
-                            cube.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
-                        }
+                    for (Cube cube : blocks) {
+                        draw(pen, cube.getMesh());
+                        cube.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
+                    }
 
 
-                        bs.show();
+                    bs.show();
 
-                        //sets rotation
-                        cube.updatePositionBasedOnCamera(Camera.getLocation());
+                    //sets rotation
+                    cube.updatePositionBasedOnCamera(Camera.getLocation());
 //                        groundGrid.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
 
-                        //movement
-                        Vector[] movementVectors = new Vector[4];
-                        Vector jumpVector = null;
-                        Vector totalMovementVector = new Vector(0,0,0);
-                        if (moveForward) {
-                            movementVectors[0] = Camera.calculateMovementVector(0);
-                        }
-                        if (moveLeft) {
-                            movementVectors[1] = Camera.calculateMovementVector(Math.PI/2.0);
-                        }
-                        if (moveBack) {
-                            movementVectors[2] = Camera.calculateMovementVector(Math.PI);
-                        }
-                        if (moveRight) {
-                            movementVectors[3] = Camera.calculateMovementVector(Math.PI/-2.0);
-                        }
-
-                        if (jumping) {
-                            if (jumpFrame/30 == 0) {
-                                jumpVector = new Vector(0, jumpDist/((totalJumpFrames+1)/2.0), 0);
-                                jumpFrame++;
-                            } else if (jumpFrame == totalJumpFrames) {
-                                jumpVector = new Vector(0, -jumpDist/((totalJumpFrames+1)/2.0), 0);
-                                jumping = false;
-                                jumpFrame = 0;
-                            } else if (jumpFrame/30 == 1) {
-                                jumpVector = new Vector(0, -jumpDist/((totalJumpFrames+1)/2.0), 0);
-                                jumpFrame++;
-                            }
-                        }
-
-                        totalMovementVector = Vector.addVectors(movementVectors);
-                        totalMovementVector.truncate(cameraMoveDist);
-                        if (jumpVector != null) {
-                            totalMovementVector.add(jumpVector);
-                        }
-                        Camera.updatePosition(totalMovementVector);
-
-                        if (!panicFlag) {
-                            mouseListener.updateFakeMousePosition(mouseMover, canvas);
-                        }
-
-                        //swap logic
-                        if (swap) {
-                            swap = false;
-                            break;
-                        }
-
-                        lastTime = now;
-
-                        //fps printing
-//                        System.out.println("Frame Rate: " + 1000/(System.currentTimeMillis() - lastFrameTime));
-                        lastFrameTime = System.currentTimeMillis();
-
-                        //cpu overhead
-                        // ~100fps hard cap, likely lower
-                        Thread.sleep(10);
+                    //movement
+                    Vector[] movementVectors = new Vector[4];
+                    Vector jumpVector = null;
+                    Vector totalMovementVector = new Vector(0,0,0);
+                    if (moveForward) {
+                        movementVectors[0] = Camera.calculateMovementVector(0);
                     }
+                    if (moveLeft) {
+                        movementVectors[1] = Camera.calculateMovementVector(Math.PI/2.0);
+                    }
+                    if (moveBack) {
+                        movementVectors[2] = Camera.calculateMovementVector(Math.PI);
+                    }
+                    if (moveRight) {
+                        movementVectors[3] = Camera.calculateMovementVector(Math.PI/-2.0);
+                    }
+
+                    if (jumping) {
+                        if (jumpFrame/30 == 0) {
+                            jumpVector = new Vector(0, jumpDist/((totalJumpFrames+1)/2.0), 0);
+                            jumpFrame++;
+                        } else if (jumpFrame == totalJumpFrames) {
+                            jumpVector = new Vector(0, -jumpDist/((totalJumpFrames+1)/2.0), 0);
+                            jumping = false;
+                            jumpFrame = 0;
+                        } else if (jumpFrame/30 == 1) {
+                            jumpVector = new Vector(0, -jumpDist/((totalJumpFrames+1)/2.0), 0);
+                            jumpFrame++;
+                        }
+                    }
+
+                    totalMovementVector = Vector.addVectors(movementVectors);
+                    totalMovementVector.truncate(cameraMoveDist);
+                    if (jumpVector != null) {
+                        totalMovementVector.add(jumpVector);
+                    }
+                    Camera.updatePosition(totalMovementVector);
+
+                    if (!panicFlag) {
+                        mouseListener.updateFakeMousePosition(mouseMover, canvas);
+                    }
+
+                    //swap logic
+                    if (swap) {
+                        swap = false;
+                        continue;
+                    }
+
+                    lastTime = now;
+
+                    //fps printing
+//                        System.out.println("Frame Rate: " + 1000/(System.currentTimeMillis() - lastFrameTime));
+                    lastFrameTime = System.currentTimeMillis();
+
+                    //cpu overhead
+                    // ~100fps hard cap, likely lower
+                    Thread.sleep(10);
                 }
             }
         }

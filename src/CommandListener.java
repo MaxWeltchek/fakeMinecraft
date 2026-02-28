@@ -124,10 +124,19 @@ public class CommandListener {
                             throw new InvalidCommand("Not a number");
                         }
                     } else if (parsedInput[0].equals("/resetcamera")) {
-                        try {
-                            Camera.resetPos();
-                        } catch (Exception e) {
-                            throw new InvalidCommand();
+                        Camera.resetPos();
+                    } else if (parsedInput[0].equals("/kill")){
+                        if (parsedInput.length != 1) {
+                            StringBuilder str = new StringBuilder();
+                            for (int i = 1; i < parsedInput.length; i++) {
+                                str.append(parsedInput[i]);
+                                if (i == parsedInput.length-2)
+                                    str.append(" ");
+                            }
+                            throw new InvalidCommand("Extraneous Parameters at \"..." + str + "\"");
+                        } else {
+                            System.out.println("Killing");
+                            System.exit(0);
                         }
                     } else {
                         throw new InvalidCommand();
