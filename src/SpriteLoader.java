@@ -18,6 +18,10 @@ public class SpriteLoader {
         }
     }
 
+    public static boolean exists(String lore) {
+        return SpriteLoader.class.getResource("resources/" + lore + ".png") != null;
+    }
+
     //generate the crafting inventory
     public static Image generateCraftingInventory() {
         try (InputStream is = SpriteLoader.class.getResourceAsStream("resources/crafting_table.png")) {

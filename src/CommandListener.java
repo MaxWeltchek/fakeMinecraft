@@ -36,59 +36,18 @@ public class CommandListener {
                             throw new InvalidCommand("Invalid quantity");
                         }
 
-                        //track how many items left
-                        int itemsLeftToGrant = quantity;
-
-                        for (int i = 0; i < 36; i++) {
-                            if (!Main.inventoryCells.get(i).occupied() && itemsLeftToGrant > 0) { //if the slot is empty, and we have items left to give, give them more items in that slot
-                                Main.inventoryCells.get(i).setItemInSlot(new Item(parsedInput[1], Main.inventoryCells.get(i).getCenterCoords(), (ItemRegistry.isStackable((parsedInput[1])) ? Math.min(itemsLeftToGrant, 64) : 1), ItemRegistry.isStackable(parsedInput[1])));
-                                //if stackable then give up to 64 then move on
-                                if (ItemRegistry.isStackable(parsedInput[1])) {
-                                    itemsLeftToGrant -= 64;
-                                } else {
-                                    itemsLeftToGrant--;
-                                }
-                                //otherwise of the slot isn't empty but has the same lore and stackable (i.e. same item) do the same thing but stack them
-                            } else if (Main.inventoryCells.get(i).occupied() && Main.inventoryCells.get(i).getItemInSlot().getLore().equals(parsedInput[1]) && itemsLeftToGrant > 0 && Main.inventoryCells.get(i).getItemInSlot().getAmount() < 64) {
-                                int temp = Main.inventoryCells.get(i).getItemInSlot().getAmount();
-                                Main.inventoryCells.get(i).getItemInSlot().setAmount(Math.min(64, Main.inventoryCells.get(i).getItemInSlot().getAmount() + itemsLeftToGrant));
-                                itemsLeftToGrant -= Main.inventoryCells.get(i).getItemInSlot().getAmount() - temp;
-                            }
+                        if (!SpriteLoader.exists(parsedInput[1])) {
+                            throw new NoItemFoundException("Item: " + parsedInput[1] + " not found");
                         }
-                        if (itemsLeftToGrant > 0) { //if not all were given (inv full), say how many were given
-                            throw new InventoryFullException(parsedInput[1], quantity - itemsLeftToGrant);
-                        } else {
-                            System.out.println("Gave " + quantity + " " + parsedInput[1].split("_")[0] + (parsedInput[1].split("_").length > 1 ? " " + parsedInput[1].split("_")[1] : "") + (quantity > 1 ? "s" : ""));
-                        }
-
+                        Main.interactions.add(new Input("give", parsedInput[1], quantity));
                     } else if (parsedInput[0].equals("/clear") && parsedInput.length == 1) { //if it's a clear command without a specific item argument
-                        //track #of cleared items
-                        int amountOfItemsCleared = 0;
-                        for (int i = 0; i < 36; i++) {
-                            //ternery to fix null pointer with short-circuiting
-                            amountOfItemsCleared += (Main.inventoryCells.get(i).occupied() ? Main.inventoryCells.get(i).getItemInSlot().getAmount() : 0);
-                            Main.inventoryCells.get(i).clearSlot();
-                        }
-                        //send cleared message
-                        System.out.println("Cleared " + amountOfItemsCleared + " item" + (amountOfItemsCleared != 1 ? "s" : ""));
+                        Main.interactions.add(new Input("clear", null, -1));
                     } else if (parsedInput[0].equals("/clear") && parsedInput.length == 2) { //same thing but with a specific item argument
-                        int amountOfItemsCleared = 0;
-                        for (int i = 0; i < 36; i++) {
-                            if (Main.inventoryCells.get(i).occupied() && Main.inventoryCells.get(i).getItemInSlot().getLore().equals(parsedInput[1])) {
-                                amountOfItemsCleared += Main.inventoryCells.get(i).getItemInSlot().getAmount();
-                                Main.inventoryCells.get(i).clearSlot();
-                            }
+                        if (!SpriteLoader.exists(parsedInput[1])) {
+                            throw new NoItemFoundException("Item: " + parsedInput[1] + " not found");
                         }
-                        //build the cleared message to include lore, for loop is to handle multiple cases of lore1_lore2_lore3 etc
-                        String[] parsedItemLore = parsedInput[1].split("_");
-                        StringBuilder clearedMessage = new StringBuilder("Cleared " + amountOfItemsCleared);
-                        for (String loreChunk : parsedItemLore) {
-                            clearedMessage.append(" ").append(loreChunk);
-                        }
-                        //add plural if not 1
-                        clearedMessage.append((amountOfItemsCleared != 0 ? "s" : ""));
-                        System.out.println(clearedMessage);
-                    } else if (parsedInput[0].equals("/help")) {
+                       Main.interactions.add(new Input("clear", parsedInput[1], -1));
+                    } else if (parsedInput[0].equals("help")) {
                         helpMessage();
                     } else if (parsedInput[0].equals("/addrecipe")) {
                         String recipeRegex = parsedInput[1];

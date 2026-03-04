@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Main {
     //stuff for canvas
@@ -55,6 +56,7 @@ public class Main {
     public static final int cameraMoveDist = 1;
     public static final double jumpDist = 10;
     private static long lastFrameTime;
+    public static ConcurrentLinkedQueue<Input> interactions = new ConcurrentLinkedQueue<>();
 
 
     //movement variables
@@ -240,6 +242,10 @@ public class Main {
                     craftingGridUpdated = false;
                 }
 
+                while (!interactions.isEmpty()) {
+                    executeInputs(interactions.poll());
+                }
+
 
                 //draw sprite and numbers for all images
                 pen.drawImage(craftingInventory, 0, 0, null);
@@ -406,5 +412,75 @@ public class Main {
     //draws a line between two points
     public static void drawLine(Graphics pen, int[] coords1, int[] coords2) {
         pen.drawLine(coords1[0], coords1[1], coords2[0], coords2[1]);
+    }
+    
+    public static void executeInputs(Input input) {
+        switch (input.getAction()) {
+            case ("give"):
+                give(input.getLore(), input.getQuantity());
+                break;
+            case ("clear"):
+                clear(input.getLore());
+                break;
+            default:
+        }
+    }
+    
+    public static void give(String item, int quantity) throws InventoryFullException {
+        //track how many items left
+        int itemsLeftToGrant = quantity;
+
+        for (int i = 0; i < 36; i++) {
+            if (!inventoryCells.get(i).occupied() && itemsLeftToGrant > 0) { //if the slot is empty, and we have items left to give, give them more items in that slot
+                inventoryCells.get(i).setItemInSlot(new Item(item, inventoryCells.get(i).getCenterCoords(), (ItemRegistry.isStackable((item)) ? Math.min(itemsLeftToGrant, 64) : 1), ItemRegistry.isStackable(item)));
+                //if stackable then give up to 64 then move on
+                if (ItemRegistry.isStackable(item)) {
+                    itemsLeftToGrant -= 64;
+                } else {
+                    itemsLeftToGrant--;
+                }
+                //otherwise of the slot isn't empty but has the same lore and stackable (i.e. same item) do the same thing but stack them
+            } else if (inventoryCells.get(i).occupied() && inventoryCells.get(i).getItemInSlot().getLore().equals(item) && itemsLeftToGrant > 0 && inventoryCells.get(i).getItemInSlot().getAmount() < 64) {
+                int temp = inventoryCells.get(i).getItemInSlot().getAmount();
+                inventoryCells.get(i).getItemInSlot().setAmount(Math.min(64, inventoryCells.get(i).getItemInSlot().getAmount() + itemsLeftToGrant));
+                itemsLeftToGrant -= inventoryCells.get(i).getItemInSlot().getAmount() - temp;
+            }
+        }
+        if (itemsLeftToGrant > 0) { //if not all were given (inv full), say how many were given
+            throw new InventoryFullException(item, quantity - itemsLeftToGrant);
+        } else {
+            System.out.println("Gave " + quantity + " " + item.split("_")[0] + (item.split("_").length > 1 ? " " + item.split("_")[1] : "") + (quantity > 1 ? "s" : ""));
+        }
+    }
+
+    public static void clear(String item) {
+        if (item == null) { //if no specified item, clear everything
+            //track #of cleared items
+            int amountOfItemsCleared = 0;
+            for (int i = 0; i < 36; i++) {
+                //ternery to fix null pointer with short-circuiting
+                amountOfItemsCleared += (Main.inventoryCells.get(i).occupied() ? Main.inventoryCells.get(i).getItemInSlot().getAmount() : 0);
+                Main.inventoryCells.get(i).clearSlot();
+            }
+            //send cleared message
+            System.out.println("Cleared " + amountOfItemsCleared + " item" + (amountOfItemsCleared != 1 ? "s" : ""));
+        } else {
+            int amountOfItemsCleared = 0;
+            for (int i = 0; i < 36; i++) {
+                if (Main.inventoryCells.get(i).occupied() && Main.inventoryCells.get(i).getItemInSlot().getLore().equals(item)) {
+                    amountOfItemsCleared += Main.inventoryCells.get(i).getItemInSlot().getAmount();
+                    Main.inventoryCells.get(i).clearSlot();
+                }
+            }
+            //build the cleared message to include lore, for loop is to handle multiple cases of lore1_lore2_lore3 etc
+            String[] parsedItemLore = item.split("_");
+            StringBuilder clearedMessage = new StringBuilder("Cleared " + amountOfItemsCleared);
+            for (String loreChunk : parsedItemLore) {
+                clearedMessage.append(" ").append(loreChunk);
+            }
+            //add plural if not 1
+            clearedMessage.append((amountOfItemsCleared != 0 ? "s" : ""));
+            System.out.println(clearedMessage);
+        }
     }
 }
