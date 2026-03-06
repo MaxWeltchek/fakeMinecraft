@@ -97,6 +97,20 @@ public class CommandListener {
                             System.out.println("Killing");
                             System.exit(0);
                         }
+                    } else if (parsedInput[0].equals("/recipes")) {
+                        if (parsedInput.length == 1) {
+                            for (Recipe recipe : RecipeList.recipeList) {
+                                System.out.println(recipe.getResult());
+                            }
+                        } else {
+                            StringBuilder temp = new StringBuilder();
+                            for (int i = 1; i < parsedInput.length; i++) {
+                                temp.append(parsedInput[i]);
+                                temp.append(" ");
+                            }
+                            temp = new StringBuilder(temp.substring(0, temp.length() - 1));
+                            throw new InvalidCommand("Extraneous Parameter At \"..." + temp + "\"");
+                        }
                     } else {
                         throw new InvalidCommand();
                     }
