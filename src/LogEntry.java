@@ -1,7 +1,7 @@
 public class LogEntry {
-    private long time;
-    private String header;
-    private String[] contents;
+    private final long time;
+    private final String header;
+    private final String[] contents;
 
     public LogEntry(String header_, String[] contents_) {
         time = System.currentTimeMillis();
