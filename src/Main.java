@@ -56,6 +56,7 @@ public class Main {
     public static final int cameraMoveDist = 1;
     public static final double jumpDist = 10;
     private static long lastFrameTime;
+    public static Logger logger = new Logger();
     public static ConcurrentLinkedQueue<Input> interactions = new ConcurrentLinkedQueue<>();
 
 
@@ -103,7 +104,6 @@ public class Main {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         canvas.createBufferStrategy(3);
-
         //listeners
         MouseHandling mouseListener = new MouseHandling();
         KeyboardHandling keyListener = new KeyboardHandling();
