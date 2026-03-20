@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.io.IOException;
 
 public class Item {
     private String lore;
@@ -7,7 +8,7 @@ public class Item {
     private int amount;
     private boolean stackable;
 
-    public Item(String lore_, int[] centerCoords_, int amount_, boolean stackable_) {
+    public Item(String lore_, int[] centerCoords_, int amount_, boolean stackable_) throws IOException {
         lore = lore_;
         sprite = SpriteLoader.generate(lore_);
         centerCoords = centerCoords_;

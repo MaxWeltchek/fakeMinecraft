@@ -249,7 +249,7 @@ public class Main {
                     throw new RuntimeException(ex);
                 }
             }
-        }, 0, 17, TimeUnit.MILLISECONDS);
+        }, 0, 14, TimeUnit.MILLISECONDS);
         Thread.sleep(Integer.MAX_VALUE);
 
     }

@@ -23,13 +23,13 @@ public class WorldBuilder {
     }
 
     public void flatWorld(ArrayList<Cube> cubes) throws IOException {
-        Main.logger.writeLog(new LogEntry("WorldBuilder", "Flat world creation started"));
+        Main.logger.writeLog(new LogEntry("WORLDBUILDER", "Flat world creation started"));
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 cubes.add(new Cube(new Points(i*10, -7, j*10), 5));
             }
         }
-        Main.logger.writeLog(new LogEntry("WorldBuilder", "Flat world generated (" + (System.currentTimeMillis() - startTime) + "ms)"));
+        Main.logger.writeLog(new LogEntry("WORLDBUILDER", "Flat world generated (" + (System.currentTimeMillis() - startTime) + "ms)"));
     }
 }

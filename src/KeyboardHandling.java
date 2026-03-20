@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 
 public class KeyboardHandling implements KeyListener {
     @Override
@@ -26,8 +27,12 @@ public class KeyboardHandling implements KeyListener {
             //emergency escape for infinite loop
             Main.panicFlag = !Main.panicFlag;
         } else if (e.getKeyChar() == 'e') {
-            Main.swap = true;
             Main.inFocus = (Main.inFocus + 1) % Main.numScreens;
+            try {
+                Main.logger.writeLog(new LogEntry("SYSTEM/INFO", "In Focus Switched: " + ((Main.inFocus == 1) ? "World" : "Inventory")));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         //rotation debug
         else if (e.getKeyChar() == 't') {
