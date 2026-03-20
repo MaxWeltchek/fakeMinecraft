@@ -26,7 +26,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.*;
+
 
 public class Main {
     //stuff for canvas
@@ -60,6 +61,20 @@ public class Main {
     private static long lastFrameTime;
     public static Logger logger = new Logger();
     public static ConcurrentLinkedQueue<Input> interactions = new ConcurrentLinkedQueue<>();
+    public static MouseHandling mouseListener = new MouseHandling();
+    public static KeyboardHandling keyListener = new KeyboardHandling();
+    public static Robot mouseMover;
+
+    public static WorldBuilder worldBuilder = new WorldBuilder();
+    public static ArrayList<Cube> blocks = new ArrayList<>();
+
+    static {
+        try {
+            mouseMover = new Robot();
+        } catch (AWTException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     //movement variables
@@ -107,16 +122,10 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         canvas.createBufferStrategy(3);
         //listeners
-        MouseHandling mouseListener = new MouseHandling();
-        KeyboardHandling keyListener = new KeyboardHandling();
         canvas.addMouseListener(mouseListener);
         canvas.addMouseMotionListener(mouseListener);
         canvas.addKeyListener(keyListener);
         canvas.requestFocusInWindow();
-
-        WorldBuilder worldBuilder = new WorldBuilder();
-        ArrayList<Cube> blocks = new ArrayList<>();
-        worldBuilder.flatWorld(blocks);
 
         //initialize all inventory cells
         for (int[] coords : allSquareCenterCoords) {
@@ -191,8 +200,6 @@ public class Main {
         baseStatePen.fillRect(0,0,880,830);
         baseStatePen.dispose();
 
-        Robot mouseMover = new Robot();
-
         Thread.sleep(500);
 
         bs = canvas.getBufferStrategy();
@@ -202,6 +209,7 @@ public class Main {
             ArrayList<LogEntry> entries = new ArrayList<>();
             entries.add(new LogEntry("SYSTEM/INFO", "Runtime Statistics: Frame Count (" + frameCount + ")"));
             entries.add(new LogEntry("SYSTEM/INFO", "Runtime Statistics: Uptime (" + formatTime(System.currentTimeMillis()- bootTime) + ")"));
+            entries.add(new LogEntry("SYSTEM/INFO", "Runtime Statistics: Average Frame Rate: " + frameCount/((System.currentTimeMillis() - bootTime)/1000.0)));
             entries.add(new LogEntry("SYSTEM/INFO", "Shutting down..."));
             for (LogEntry entry : entries) {
                 try {
@@ -222,16 +230,35 @@ public class Main {
         inventoryCells.get(6).setItemInSlot(new Item("iron_chestplate", inventoryCells.get(6).getCenterCoords(), 1, false));
         inventoryCells.get(7).setItemInSlot(new Item("iron_block", inventoryCells.get(7).getCenterCoords(), 1, true));
 
-        //set in focus
-        Graphics pen = bs.getDrawGraphics();
+        //make world
+        worldBuilder.flatWorld(blocks);
 
         //setup command listener
         CommandListener commandListener = new CommandListener();
         commandListener.start();
 
-        pen.setFont(Font.createFont(Font.PLAIN, Objects.requireNonNull(Main.class.getResourceAsStream("resources/minecraft.ttf"))).deriveFont(18f));
+        //actual rendering with scheduled frames
+        ScheduledExecutorService renderer = Executors.newSingleThreadScheduledExecutor();
+        ScheduledFuture<?> renderTask = renderer.scheduleAtFixedRate(() -> {
+            try {
+                Main.frameTick();
+            } catch (IOException | FontFormatException e) {
+                try {
+                    logger.writeLog(new LogEntry("SYSTEM/INFO", "FATAL: An unknown error occurred"));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }, 0, 17, TimeUnit.MILLISECONDS);
+        Thread.sleep(Integer.MAX_VALUE);
 
-        while (true) {
+    }
+
+    public static void frameTick() throws IOException, FontFormatException {
+
+        Graphics pen = bs.getDrawGraphics();
+        pen.setFont(Font.createFont(Font.PLAIN, Objects.requireNonNull(Main.class.getResourceAsStream("resources/minecraft.ttf"))).deriveFont(18f));
+        {
 
             //crafting grid loop
             if (inFocus == 1) {
@@ -280,98 +307,71 @@ public class Main {
                     heldItem.move(mouseCoords.clone());
                 }
                 bs.show();
-
-                if (swap) {
-                    swap = false;
-                    continue;
-                }
-
-                // ~100fps hard cap, likely lower
-                Thread.sleep(10);
             }
             //world loop
             else if (inFocus == 0) {
-                long lastTime = System.currentTimeMillis();
-                long now = System.currentTimeMillis();
-                // rudimentary frame limiting
-                if (now - lastTime >= 1) {
-                    clearScreen(pen);
+                clearScreen(pen);
 
 //                        draw(pen, groundGrid.getMesh());
-                    for (Cube cube : blocks) {
-                        draw(pen, cube.getMesh());
-                        cube.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
-                    }
+                for (Cube cube : blocks) {
+                    draw(pen, cube.getMesh());
+                    cube.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
+                }
 
 
-                    bs.show();
+                bs.show();
 
-                    //sets rotation
-                    cube.updatePositionBasedOnCamera(Camera.getLocation());
+                //sets rotation
+                cube.updatePositionBasedOnCamera(Camera.getLocation());
 //                        groundGrid.getMesh().updatePositionBasedOnCamera(Camera.getLocation());
 
-                    //movement
-                    Vector[] movementVectors = new Vector[4];
-                    Vector jumpVector = null;
-                    Vector totalMovementVector = new Vector(0,0,0);
-                    if (moveForward) {
-                        movementVectors[0] = Camera.calculateMovementVector(0);
-                    }
-                    if (moveLeft) {
-                        movementVectors[1] = Camera.calculateMovementVector(Math.PI/2.0);
-                    }
-                    if (moveBack) {
-                        movementVectors[2] = Camera.calculateMovementVector(Math.PI);
-                    }
-                    if (moveRight) {
-                        movementVectors[3] = Camera.calculateMovementVector(Math.PI/-2.0);
-                    }
-
-                    if (jumping) {
-                        if (jumpFrame/30 == 0) {
-                            jumpVector = new Vector(0, jumpDist/((totalJumpFrames+1)/2.0), 0);
-                            jumpFrame++;
-                        } else if (jumpFrame == totalJumpFrames) {
-                            jumpVector = new Vector(0, -jumpDist/((totalJumpFrames+1)/2.0), 0);
-                            jumping = false;
-                            jumpFrame = 0;
-                        } else if (jumpFrame/30 == 1) {
-                            jumpVector = new Vector(0, -jumpDist/((totalJumpFrames+1)/2.0), 0);
-                            jumpFrame++;
-                        }
-                    }
-
-                    totalMovementVector = Vector.addVectors(movementVectors);
-                    totalMovementVector.truncate(cameraMoveDist);
-                    if (jumpVector != null) {
-                        totalMovementVector.add(jumpVector);
-                    }
-                    Camera.updatePosition(totalMovementVector);
-
-                    if (!panicFlag) {
-                        mouseListener.updateFakeMousePosition(mouseMover, canvas);
-                    }
-
-                    //swap logic
-                    if (swap) {
-                        swap = false;
-                        continue;
-                    }
-
-                    lastTime = now;
-
-                    //fps printing
-//                        System.out.println("Frame Rate: " + 1000/(System.currentTimeMillis() - lastFrameTime));
-                    lastFrameTime = System.currentTimeMillis();
-
-                    //cpu overhead
-                    // ~100fps hard cap, likely lower
-                    Thread.sleep(10);
-                    frameCount++;
+                //movement
+                Vector[] movementVectors = new Vector[4];
+                Vector jumpVector = null;
+                Vector totalMovementVector = new Vector(0,0,0);
+                if (moveForward) {
+                    movementVectors[0] = Camera.calculateMovementVector(0);
                 }
+                if (moveLeft) {
+                    movementVectors[1] = Camera.calculateMovementVector(Math.PI/2.0);
+                }
+                if (moveBack) {
+                    movementVectors[2] = Camera.calculateMovementVector(Math.PI);
+                }
+                if (moveRight) {
+                    movementVectors[3] = Camera.calculateMovementVector(Math.PI/-2.0);
+                }
+
+                if (jumping) {
+                    if (jumpFrame/30 == 0) {
+                        jumpVector = new Vector(0, jumpDist/((totalJumpFrames+1)/2.0), 0);
+                        jumpFrame++;
+                    } else if (jumpFrame == totalJumpFrames) {
+                        jumpVector = new Vector(0, -jumpDist/((totalJumpFrames+1)/2.0), 0);
+                        jumping = false;
+                        jumpFrame = 0;
+                    } else if (jumpFrame/30 == 1) {
+                        jumpVector = new Vector(0, -jumpDist/((totalJumpFrames+1)/2.0), 0);
+                        jumpFrame++;
+                    }
+                }
+
+                totalMovementVector = Vector.addVectors(movementVectors);
+                totalMovementVector.truncate(cameraMoveDist);
+                if (jumpVector != null) {
+                    totalMovementVector.add(jumpVector);
+                }
+                Camera.updatePosition(totalMovementVector);
+
+                if (!panicFlag) {
+                    mouseListener.updateFakeMousePosition(mouseMover, canvas);
+                }
+
+                frameCount++;
             }
         }
     }
+
     public static void decrementCraftingSlots() {
         for (int i = 36; i <= 44; i++) {
             if (inventoryCells.get(i).occupied()) {
