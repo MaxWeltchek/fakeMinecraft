@@ -48,6 +48,8 @@ public class KeyboardHandling implements KeyListener {
             if (!Main.jumping) {
                 Main.jumping = true;
                 }
+        } else if (e.getKeyChar() == 'g') {
+            Main.mouseListener.resetFakeMouse();
         }
     }
 

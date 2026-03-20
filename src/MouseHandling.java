@@ -218,4 +218,9 @@ public class MouseHandling implements MouseListener, MouseMotionListener {
         Main.fakeMouseCoords[1] += realMouseDistanceMoved[1];
         mouseMover.mouseMove((int) canvas.getLocationOnScreen().getX() + 400, (int) canvas.getLocationOnScreen().getY() + 400);
     }
+
+    public void resetFakeMouse() {
+        Main.fakeMouseCoords[0] = 0;
+        Main.fakeMouseCoords[1] = 0;
+    }
 }
