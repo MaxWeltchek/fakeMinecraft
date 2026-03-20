@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.net.URL;
 import java.io.IOException;
@@ -9,7 +11,6 @@ import java.nio.file.StandardOpenOption;
 public class CommandListener {
     private volatile boolean running = false;
     private Thread listenerThread;
-
     public void start() throws InvalidCommand{
         running = true;
 
@@ -20,6 +21,7 @@ public class CommandListener {
                 try {
                     String input = scanner.nextLine();
                     String[] parsedInput = input.split(" ");
+                    Main.logger.writeLog(new LogEntry("COMMANDLISTENER/INFO", "input: \"" + input + "\""));
 
                     if (parsedInput[0].equals("/give")) {
                         if (parsedInput.length == 1) {
@@ -58,6 +60,9 @@ public class CommandListener {
                             throw new RuntimeException(e);
                         }
                     } else if (parsedInput[0].equals("/movecamera")) {
+                        if (parsedInput.length < 2) {
+                            throw new InvalidCommand("Missing Parameters");
+                        }
                         try {
                             if (parsedInput[1].equals("up")) {
                                 if (parsedInput.length > 2) {
@@ -71,6 +76,7 @@ public class CommandListener {
                                 } else {
                                     Camera.updatePosition(new Vector(0, -30, 0));
                                 }
+                                Main.logger.writeLog(new LogEntry("CAMERA/INFO", "Position updated, " + Arrays.toString(Camera.getCoordinates())));
                             } else {
                                 try {
                                     Integer.parseInt(parsedInput[1]);
@@ -116,6 +122,11 @@ public class CommandListener {
                     }
                 } catch (InvalidCommand | NoItemFoundException | InventoryFullException e) {
                     System.out.println(e.getMessage());
+                    try {
+                        Main.logger.writeLog(new LogEntry("COMMANDLISTENER/ERROR", e.getMessage()));
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 } catch (Exception e) {
                     System.out.println("Command failed " + e.getMessage());
                 }

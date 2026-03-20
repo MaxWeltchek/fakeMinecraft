@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.util.Arrays;
+
 public class Camera {
 
     //holds only focal length and camera coordinates
@@ -50,9 +53,8 @@ public class Camera {
         rotation[2] = Math.PI;
     }
 
-    public static void updatePosition(Vector movement) {
+    public static void updatePosition(Vector movement) throws IOException {
         coordinates[0] += movement.getDirection()[0];
         coordinates[1] += movement.getDirection()[1];
-        coordinates[2] += movement.getDirection()[2];
-    }
+        coordinates[2] += movement.getDirection()[2];}
 }

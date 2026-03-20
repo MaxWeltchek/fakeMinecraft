@@ -55,6 +55,8 @@ public class Main {
     public static volatile boolean swap = false;
     public static final int cameraMoveDist = 1;
     public static final double jumpDist = 10;
+    public static int frameCount = 0;
+    public static final long bootTime = System.currentTimeMillis();
     private static long lastFrameTime;
     public static Logger logger = new Logger();
     public static ConcurrentLinkedQueue<Input> interactions = new ConcurrentLinkedQueue<>();
@@ -195,6 +197,20 @@ public class Main {
 
         bs = canvas.getBufferStrategy();
         craftingInventory = SpriteLoader.generateCraftingInventory();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            ArrayList<LogEntry> entries = new ArrayList<>();
+            entries.add(new LogEntry("SYSTEM/INFO", "Runtime Statistics: Frame Count (" + frameCount + ")"));
+            entries.add(new LogEntry("SYSTEM/INFO", "Runtime Statistics: Uptime (" + formatTime(System.currentTimeMillis()- bootTime) + ")"));
+            entries.add(new LogEntry("SYSTEM/INFO", "Shutting down..."));
+            for (LogEntry entry : entries) {
+                try {
+                    logger.writeLog(entry);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }));
 
         //load items
         inventoryCells.get(0).setItemInSlot(new Item("iron_ingot", inventoryCells.get(0).getCenterCoords(), 9, true));
@@ -351,6 +367,7 @@ public class Main {
                     //cpu overhead
                     // ~100fps hard cap, likely lower
                     Thread.sleep(10);
+                    frameCount++;
                 }
             }
         }
@@ -414,7 +431,7 @@ public class Main {
         pen.drawLine(coords1[0], coords1[1], coords2[0], coords2[1]);
     }
     
-    public static void executeInputs(Input input) {
+    public static void executeInputs(Input input) throws IOException {
         switch (input.getAction()) {
             case ("give"):
                 give(input.getLore(), input.getQuantity());
@@ -426,7 +443,7 @@ public class Main {
         }
     }
     
-    public static void give(String item, int quantity) throws InventoryFullException {
+    public static void give(String item, int quantity) throws InventoryFullException, IOException {
         //track how many items left
         int itemsLeftToGrant = quantity;
 
@@ -449,11 +466,12 @@ public class Main {
         if (itemsLeftToGrant > 0) { //if not all were given (inv full), say how many were given
             throw new InventoryFullException(item, quantity - itemsLeftToGrant);
         } else {
+            logger.writeLog(new LogEntry("INTERACTIONS/INFO", "Gave " + quantity + " " + item.split("_")[0] + (item.split("_").length > 1 ? " " + item.split("_")[1] : "") + (quantity > 1 ? "s" : "")));
             System.out.println("Gave " + quantity + " " + item.split("_")[0] + (item.split("_").length > 1 ? " " + item.split("_")[1] : "") + (quantity > 1 ? "s" : ""));
         }
     }
 
-    public static void clear(String item) {
+    public static void clear(String item) throws IOException {
         if (item == null) { //if no specified item, clear everything
             //track #of cleared items
             int amountOfItemsCleared = 0;
@@ -464,6 +482,7 @@ public class Main {
             }
             //send cleared message
             System.out.println("Cleared " + amountOfItemsCleared + " item" + (amountOfItemsCleared != 1 ? "s" : ""));
+            logger.writeLog(new LogEntry("INTERACTIONS/INFO", "Cleared " + amountOfItemsCleared + " item" + (amountOfItemsCleared != 1 ? "s" : "")));
         } else {
             int amountOfItemsCleared = 0;
             for (int i = 0; i < 36; i++) {
@@ -482,5 +501,14 @@ public class Main {
             clearedMessage.append((amountOfItemsCleared != 0 ? "s" : ""));
             System.out.println(clearedMessage);
         }
+    }
+
+    public static String formatTime(long time) {
+        long totalSeconds = time / 1000;
+        long minutes = (totalSeconds / 60) % 60;
+        long seconds = totalSeconds % 60;
+        long hours = ((totalSeconds / 3600) % 24);
+
+        return String.format("[%02d:%02d:%02d]", hours, minutes, seconds);
     }
 }

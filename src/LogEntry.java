@@ -17,7 +17,7 @@ public class LogEntry {
         long totalSeconds = time / 1000;
         long minutes = (totalSeconds / 60) % 60;
         long seconds = totalSeconds % 60;
-        long hours = ((totalSeconds / 3600) % 24) - 7;
+        long hours = ((totalSeconds / 3600) % 24);
 
         return String.format("[%02d:%02d:%02d]", hours, minutes, seconds);
     }
