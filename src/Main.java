@@ -1,24 +1,3 @@
-///
-///
-/// classes: item (has coordinates, UUID, description, sprite, recipe), mouseHandling, helper class to assign sprites from resources folder into
-/// bufferedImages for the item class.
-///
-/// premise: inventory + crafting screen with a hotkey
-///
-/// when "picking up" an item, start a animation event which will update the scale and relative position per frame until complete
-/// ,this should be something in a item class like a method called animation(double scaleChange, int[] translation)
-///
-/// for crafting: store some basic unstackable, no easy way to add all, they are all shaped, and you just check if the crafting grid
-/// int\[3]\[3] (values are UUIDs, at the end we can pull the actual item lore from a lore arrayList where UUID is index) if it is
-/// there is some given return value. Actually add a recipe instance variable to each object (null if none), and just reference that
-/// only check when there is an update in the crafting grid, when there is it's simply a O(n^2) where n is # of items.
-/// there is only about 1000 items in the base game and far less in my program so we can throw compute at this problem
-/// IMPORTANT: cannot check every frame since that would destroy performance, I believe an implementation would be to have a
-/// "grid changed" bool flag, if the craftingGrid\[]\[] gets updated we set to true, after checking for possible unstackable we set to false.
-///
-/// if the "ghost" result is grabbed, just clear the crafting grid and make a new item (delete all items that are in the crafting grid, they are consumed)
-/// edge cases like milk buckets in cakes will be ignored currently.
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
