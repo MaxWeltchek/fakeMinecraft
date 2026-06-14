@@ -5,12 +5,12 @@ import minecraftclone.input.CommandListener;
 import minecraftclone.input.Input;
 import minecraftclone.input.KeyboardHandling;
 import minecraftclone.input.MouseHandling;
-import minecraftclone.inventory.InventoryCell;
 import minecraftclone.inventory.InventoryFullException;
 import minecraftclone.inventory.Item;
 import minecraftclone.inventory.ItemRegistry;
 import minecraftclone.logging.LogEntry;
 import minecraftclone.logging.Logger;
+import minecraftclone.player.Player;
 import minecraftclone.rendering.Camera;
 import minecraftclone.rendering.Grid;
 import minecraftclone.rendering.Mesh;
@@ -90,27 +90,7 @@ public class Main {
     public static Mesh pyramid;
     public static Grid groundGrid;
 
-    public static final int[][] allSquareCenterCoords = new int[][]{
-            //top inventory row indices 0-8
-            {80, 460}, {170, 460}, {260, 460}, {350, 460}, {440, 460}, {530, 460}, {620, 460}, {710, 460}, {800, 460},
-            //middle inventory row indices 9-17
-            {80, 550}, {170, 550}, {260, 550}, {350, 550}, {440, 550}, {530, 550}, {620, 550}, {710, 550}, {800, 550},
-            //bottom inventory row indices 18-26
-            {80, 640}, {170, 640}, {260, 640}, {350, 640}, {440, 640}, {530, 640}, {620, 640}, {710, 640}, {800, 640},
-            //hotbar, indices 27-35
-            {80, 750}, {170, 750}, {260, 750}, {350, 750}, {440, 750}, {530, 750}, {620, 750}, {710, 750}, {800, 750},
-            //all crafting grid squares are indices 36-44
-            //crafting grid top row
-            {190, 125}, {280, 125}, {370, 125},
-            //crafting grid middle row
-            {190, 215}, {280, 215}, {370, 215},
-            //crafting grid bottom row
-            {190, 305}, {280, 305}, {370, 305},
-            //crafting output slot index 45
-            {660, 215}
-    };
-
-    public static ArrayList<InventoryCell> inventoryCells = new ArrayList<>();
+    public static Player max = new Player("Maxz");
 
 
     public static void main(String[] args) throws InterruptedException, IOException, FontFormatException, AWTException {
@@ -127,11 +107,6 @@ public class Main {
         canvas.addMouseMotionListener(mouseListener);
         canvas.addKeyListener(keyListener);
         canvas.requestFocusInWindow();
-
-        //initialize all inventory cells
-        for (int[] coords : allSquareCenterCoords) {
-            inventoryCells.add(new InventoryCell(coords));
-        }
 
         //making shapes
 
@@ -203,14 +178,14 @@ public class Main {
         }));
 
         //load items
-        inventoryCells.get(0).setItemInSlot(new Item("iron_ingot", inventoryCells.get(0).getCenterCoords(), 9, true));
-        inventoryCells.get(1).setItemInSlot(new Item("copper_ingot", inventoryCells.get(1).getCenterCoords(), 1, true));
-        inventoryCells.get(2).setItemInSlot(new Item("diamond", inventoryCells.get(2).getCenterCoords(), 10, true));
-        inventoryCells.get(3).setItemInSlot(new Item("diamond", inventoryCells.get(3).getCenterCoords(), 3, true));
-        inventoryCells.get(4).setItemInSlot(new Item("stick", inventoryCells.get(4).getCenterCoords(), 1, true));
-        inventoryCells.get(5).setItemInSlot(new Item("iron_chestplate", inventoryCells.get(5).getCenterCoords(), 1, false));
-        inventoryCells.get(6).setItemInSlot(new Item("iron_chestplate", inventoryCells.get(6).getCenterCoords(), 1, false));
-        inventoryCells.get(7).setItemInSlot(new Item("iron_block", inventoryCells.get(7).getCenterCoords(), 1, true));
+        max.inventory.setItemInSlot(0, new Item("iron_ingot", max.inventory.getCenterCoords(0), 9, true));
+        max.inventory.setItemInSlot(1, new Item("copper_ingot", max.inventory.getCenterCoords(1), 1, true));
+        max.inventory.setItemInSlot(2, new Item("diamond", max.inventory.getCenterCoords(2), 10, true));
+        max.inventory.setItemInSlot(3, new Item("diamond", max.inventory.getCenterCoords(3), 3, true));
+        max.inventory.setItemInSlot(4, new Item("stick", max.inventory.getCenterCoords(4), 1, true));
+        max.inventory.setItemInSlot(5, new Item("iron_chestplate", max.inventory.getCenterCoords(5), 1, false));
+        max.inventory.setItemInSlot(6, new Item("iron_chestplate", max.inventory.getCenterCoords(6), 1, false));
+        max.inventory.setItemInSlot(7, new Item("iron_block", max.inventory.getCenterCoords(7), 1, true));
 
         //make world
         worldBuilder.flatWorld(blocks);
@@ -246,24 +221,24 @@ public class Main {
             if (inFocus == 1) {
                 //if crafting grid has at least one non-null value TODO: make better than stupid spaghetti code
                 //index 45 is the crafting result slot
-                if (craftingGridUpdated && (inventoryCells.get(36).occupied() || inventoryCells.get(37).occupied() || inventoryCells.get(38).occupied() || inventoryCells.get(39).occupied() || inventoryCells.get(40).occupied() || inventoryCells.get(41).occupied() || inventoryCells.get(42).occupied() || inventoryCells.get(43).occupied() || inventoryCells.get(44).occupied())) {
+                if (craftingGridUpdated && (max.inventory.isOccupied(36) || max.inventory.isOccupied(37) || max.inventory.isOccupied(38) || max.inventory.isOccupied(39) || max.inventory.isOccupied(40) || max.inventory.isOccupied(41) || max.inventory.isOccupied(42) || max.inventory.isOccupied(43) || max.inventory.isOccupied(44))) {
                     //store all crafting grid values in a tempCrafting array to compare with known unstackable
                     String[] tempCrafting = new String[9];
                     for (int i = 36; i <= 44; i++) {
-                        if (inventoryCells.get(i).occupied())
-                            tempCrafting[i - 36] = inventoryCells.get(i).getItemInSlot().getLore();
+                        if (max.inventory.isOccupied(i))
+                            tempCrafting[i - 36] = max.inventory.getItemInSlot(i).getLore();
                     }
                     //find the location of the recipe in the recipe list, -1 if it doesn't exist
                     int locationOfRecipe = RecipeList.recipeExists(tempCrafting);
                     //if it exists, put it in the slot otherwise clear the slot to get rid of past results
                     if (locationOfRecipe != -1) {
-                        inventoryCells.get(45).setItemInSlot(new Item(RecipeList.recipeList.get(locationOfRecipe).getResult(), inventoryCells.get(45).getCenterCoords(), RecipeList.recipeList.get(locationOfRecipe).getQuantity(), RecipeList.recipeList.get(locationOfRecipe).isStackable()));
+                        max.inventory.setItemInSlot(45, new Item(RecipeList.recipeList.get(locationOfRecipe).getResult(), max.inventory.getCenterCoords(45), RecipeList.recipeList.get(locationOfRecipe).getQuantity(), RecipeList.recipeList.get(locationOfRecipe).isStackable()));
                     } else {
-                        inventoryCells.get(45).clearSlot();
+                        max.inventory.clearSlot(45);
                     }
                     craftingGridUpdated = false;
                 } else if (craftingGridUpdated) { //if no items in grid get rid of result
-                    inventoryCells.get(45).clearSlot();
+                    max.inventory.clearSlot(45);
                     craftingGridUpdated = false;
                 }
 
@@ -275,11 +250,12 @@ public class Main {
                 //draw sprite and numbers for all images
                 pen.drawImage(craftingInventory, 0, 0, null);
                 pen.setColor(Color.BLACK);
-                for (InventoryCell cell : inventoryCells) {
-                    if (cell.occupied()) {
-                        pen.drawImage(cell.getItemInSlot().getSprite(), cell.getItemInSlot().getCoords()[0] - itemDimension / 2, cell.getItemInSlot().getCoords()[1] - itemDimension / 2, null);
-                        if (cell.getItemInSlot().getAmount() > 1)
-                            pen.drawString(cell.getItemInSlot().getAmount() + "", cell.getItemInSlot().getCoords()[0] + 25, cell.getItemInSlot().getCoords()[1] + 38);
+                Item[] tempCopyOfAllItemsInInventory = max.inventory.getAllItems();
+                for (Item item : tempCopyOfAllItemsInInventory) {
+                    if (item != null) {
+                        pen.drawImage(item.getSprite(), item.getCoords()[0] - itemDimension / 2, item.getCoords()[1] - itemDimension / 2, null);
+                        if (item.getAmount() > 1)
+                            pen.drawString(item.getAmount() + "", item.getCoords()[0] + 25, item.getCoords()[1] + 38);
                     }
                 }
                 if (heldItem != null) {
@@ -356,10 +332,10 @@ public class Main {
 
     public static void decrementCraftingSlots() {
         for (int i = 36; i <= 44; i++) {
-            if (inventoryCells.get(i).occupied()) {
-                inventoryCells.get(i).getItemInSlot().decrement();
-                if (inventoryCells.get(i).getItemInSlot().getAmount() <= 0) {
-                    inventoryCells.get(i).clearSlot();
+            if (max.inventory.isOccupied(i)) {
+                max.inventory.getItemInSlot(i).decrement();
+                if (max.inventory.getItemInSlot(i).getAmount() <= 0) {
+                    max.inventory.clearSlot(i);
                 }
             }
         }
@@ -430,8 +406,8 @@ public class Main {
         int itemsLeftToGrant = quantity;
 
         for (int i = 0; i < 36; i++) {
-            if (!inventoryCells.get(i).occupied() && itemsLeftToGrant > 0) { //if the slot is empty, and we have items left to give, give them more items in that slot
-                inventoryCells.get(i).setItemInSlot(new Item(item, inventoryCells.get(i).getCenterCoords(), (ItemRegistry.isStackable((item)) ? Math.min(itemsLeftToGrant, 64) : 1), ItemRegistry.isStackable(item)));
+            if (!max.inventory.isOccupied(i) && itemsLeftToGrant > 0) { //if the slot is empty, and we have items left to give, give them more items in that slot
+                max.inventory.setItemInSlot(i, new Item(item, max.inventory.getCenterCoords(i), (ItemRegistry.isStackable((item)) ? Math.min(itemsLeftToGrant, 64) : 1), ItemRegistry.isStackable(item)));
                 //if stackable then give up to 64 then move on
                 if (ItemRegistry.isStackable(item)) {
                     itemsLeftToGrant -= 64;
@@ -439,10 +415,10 @@ public class Main {
                     itemsLeftToGrant--;
                 }
                 //otherwise of the slot isn't empty but has the same lore and stackable (i.e. same item) do the same thing but stack them
-            } else if (inventoryCells.get(i).occupied() && inventoryCells.get(i).getItemInSlot().getLore().equals(item) && itemsLeftToGrant > 0 && inventoryCells.get(i).getItemInSlot().getAmount() < 64) {
-                int temp = inventoryCells.get(i).getItemInSlot().getAmount();
-                inventoryCells.get(i).getItemInSlot().setAmount(Math.min(64, inventoryCells.get(i).getItemInSlot().getAmount() + itemsLeftToGrant));
-                itemsLeftToGrant -= inventoryCells.get(i).getItemInSlot().getAmount() - temp;
+            } else if (max.inventory.isOccupied(i) && max.inventory.getItemInSlot(i).getLore().equals(item) && itemsLeftToGrant > 0 && max.inventory.getItemInSlot(i).getAmount() < 64) {
+                int temp = max.inventory.getItemInSlot(i).getAmount();
+                max.inventory.getItemInSlot(i).setAmount(Math.min(64, max.inventory.getItemInSlot(i).getAmount() + itemsLeftToGrant));
+                itemsLeftToGrant -= max.inventory.getItemInSlot(i).getAmount() - temp;
             }
         }
         if (itemsLeftToGrant > 0) { //if not all were given (inv full), say how many were given
@@ -459,8 +435,8 @@ public class Main {
             int amountOfItemsCleared = 0;
             for (int i = 0; i < 36; i++) {
                 //ternery to fix null pointer with short-circuiting
-                amountOfItemsCleared += (Main.inventoryCells.get(i).occupied() ? Main.inventoryCells.get(i).getItemInSlot().getAmount() : 0);
-                Main.inventoryCells.get(i).clearSlot();
+                amountOfItemsCleared += (Main.max.inventory.isOccupied(i) ? Main.max.inventory.getItemInSlot(i).getAmount() : 0);
+                Main.max.inventory.clearSlot(i);
             }
             //send cleared message
             System.out.println("Cleared " + amountOfItemsCleared + " item" + (amountOfItemsCleared != 1 ? "s" : ""));
@@ -468,9 +444,9 @@ public class Main {
         } else {
             int amountOfItemsCleared = 0;
             for (int i = 0; i < 36; i++) {
-                if (Main.inventoryCells.get(i).occupied() && Main.inventoryCells.get(i).getItemInSlot().getLore().equals(item)) {
-                    amountOfItemsCleared += Main.inventoryCells.get(i).getItemInSlot().getAmount();
-                    Main.inventoryCells.get(i).clearSlot();
+                if (Main.max.inventory.isOccupied(i) && Main.max.inventory.getItemInSlot(i).getLore().equals(item)) {
+                    amountOfItemsCleared += Main.max.inventory.getItemInSlot(i).getAmount();
+                    Main.max.inventory.clearSlot(i);
                 }
             }
             //build the cleared message to include lore, for loop is to handle multiple cases of lore1_lore2_lore3 etc
@@ -479,7 +455,6 @@ public class Main {
             for (String loreChunk : parsedItemLore) {
                 clearedMessage.append(" ").append(loreChunk);
             }
-            //add plural if not 1
             clearedMessage.append((amountOfItemsCleared != 0 ? "s" : ""));
             System.out.println(clearedMessage);
         }

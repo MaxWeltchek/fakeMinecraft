@@ -10,7 +10,6 @@ import minecraftclone.rendering.Camera;
 import minecraftclone.rendering.SpriteLoader;
 import minecraftclone.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.net.URL;

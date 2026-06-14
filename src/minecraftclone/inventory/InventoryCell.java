@@ -9,23 +9,19 @@ public class InventoryCell {
         itemInSlot = null;
     }
 
-    public boolean occupied() {
-        return itemInSlot != null;
-    }
-
-    public Item getItemInSlot() {
+    protected Item getItemInSlot() {
         return itemInSlot;
     }
 
-    public int[] getCenterCoords() {
+    protected int[] getCenterCoords() {
         return centerCoords;
     }
 
-    public void setItemInSlot(Item item) {
+    protected void setItemInSlot(Item item) {
         itemInSlot = item;
     }
 
-    public void clearSlot() {
+    protected void clearSlot() {
         itemInSlot = null;
     }
 }

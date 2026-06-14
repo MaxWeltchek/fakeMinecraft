@@ -1,7 +1,6 @@
 package minecraftclone.input;
 
 import minecraftclone.Main;
-import minecraftclone.inventory.InventoryCell;
 import minecraftclone.inventory.Item;
 import minecraftclone.rendering.Camera;
 
@@ -36,14 +35,14 @@ public class MouseHandling implements MouseListener, MouseMotionListener {
             //if the square picked is an inventory cell find the first hotbar slot free
             if (nearestCell <= 26) {
                 for (int i = 35; i >= 27; i--) {
-                    if (!Main.inventoryCells.get(i).occupied()) {
+                    if (!Main.max.inventory.isOccupied(i)) {
                         firstAvailable = i;
                         break;
                     }
                 }
             } else if (nearestCell <= 35) { //if the square picked is a hotbar slot, put it in the first (furthest top and left) inventory slot free
                 for (int i = 0; i <= 26; i++) {
-                    if (!Main.inventoryCells.get(i).occupied()) {
+                    if (!Main.max.inventory.isOccupied(i)) {
                         firstAvailable = i;
                         break;
                     }
@@ -51,14 +50,14 @@ public class MouseHandling implements MouseListener, MouseMotionListener {
             } else { //if it's a crafting grid square, try hotbar then inventory with same logic as above
                 //tries hotbar
                 for (int i = 35; i >= 27; i--) {
-                    if (!Main.inventoryCells.get(i).occupied()) {
+                    if (!Main.max.inventory.isOccupied(i)) {
                         firstAvailable = i;
                         break;
                     }
                 }
                 if (firstAvailable == -1) { //if no free hotbar slots try inventory
                     for (int i = 0; i <= 26; i++) {
-                        if (!Main.inventoryCells.get(i).occupied()) {
+                        if (!Main.max.inventory.isOccupied(i)) {
                             firstAvailable = i;
                             break;
                         }
@@ -73,10 +72,10 @@ public class MouseHandling implements MouseListener, MouseMotionListener {
 
             //sets new item in that cell, moves it, then clears original cell
             //unsure if this is less overhead than checking if nothing would happen in the first place (i.e. firstAvailable == nearestCell)
-            if (Main.inventoryCells.get(nearestCell).occupied()) {
-                Main.inventoryCells.get(firstAvailable).setItemInSlot(Main.inventoryCells.get(nearestCell).getItemInSlot().clone());
-                Main.inventoryCells.get(firstAvailable).getItemInSlot().move(Main.inventoryCells.get(firstAvailable).getCenterCoords());
-                Main.inventoryCells.get(nearestCell).clearSlot();
+            if (Main.max.inventory.isOccupied(nearestCell)) {
+                Main.max.inventory.setItemInSlot(firstAvailable, Main.max.inventory.getItemInSlot(nearestCell).clone());
+                Main.max.inventory.getItemInSlot(firstAvailable).move(Main.max.inventory.getCenterCoords(firstAvailable));
+                Main.max.inventory.clearSlot(nearestCell);
 
             }
             //short circuit instead of giant if case
@@ -84,11 +83,8 @@ public class MouseHandling implements MouseListener, MouseMotionListener {
 
         //if not holding anything
         else if (Main.heldItem == null) {
-            for (InventoryCell cell : Main.inventoryCells) {
-                Item item;
-                if (cell.occupied()) {
-                    item = cell.getItemInSlot();
-                } else {
+            for (Item item : Main.max.inventory.getAllItems()) {
+                if (item == null) {
                     continue;
                 }
                 //if inside the item box
@@ -102,16 +98,16 @@ public class MouseHandling implements MouseListener, MouseMotionListener {
                     }
                     if (e.getButton() == MouseEvent.BUTTON1) {
                         //clear the best slot
-                        Main.inventoryCells.get(findNearestCell(new int[]{e.getX(), e.getY()})).setItemInSlot(null);
+                        Main.max.inventory.setItemInSlot(findNearestCell(new int[]{e.getX(), e.getY()}), null);
                         Main.heldItem = item;
                         break;
                     } else if (e.getButton() == MouseEvent.BUTTON3) { //split the stack if right click
-                        Main.heldItem = Main.inventoryCells.get(findNearestCell(new int[]{e.getX(), e.getY()})).getItemInSlot().clone();
-                        Main.inventoryCells.get(findNearestCell(new int[]{e.getX(), e.getY()})).getItemInSlot().setAmount(Main.inventoryCells.get(findNearestCell(new int[]{e.getX(), e.getY()})).getItemInSlot().getAmount() / 2);
+                        Main.heldItem = Main.max.inventory.getItemInSlot(findNearestCell(new int[]{e.getX(), e.getY()})).clone();
+                        Main.max.inventory.getItemInSlot(findNearestCell(new int[]{e.getX(), e.getY()})).setAmount(Main.max.inventory.getItemInSlot(findNearestCell(new int[]{e.getX(), e.getY()})).getAmount() / 2);
                         Main.heldItem.setAmount((Main.heldItem.getAmount() / 2) + (Main.heldItem.getAmount() %2));
 
-                        if (Main.inventoryCells.get(findNearestCell(new int[]{e.getX(), e.getY()})).getItemInSlot().getAmount() == 0) {
-                            Main.inventoryCells.get(findNearestCell(new int[]{e.getX(), e.getY()})).clearSlot();
+                        if (Main.max.inventory.getItemInSlot(findNearestCell(new int[]{e.getX(), e.getY()})).getAmount() == 0) {
+                            Main.max.inventory.clearSlot(findNearestCell(new int[]{e.getX(), e.getY()}));
                         }
                     }
                 }
@@ -125,36 +121,36 @@ public class MouseHandling implements MouseListener, MouseMotionListener {
                 Main.craftingGridUpdated = true;
             } //or if we are holding something we can't click on crafting output slot
             else if (bestPoint == 45) {
-                if (Main.inventoryCells.get(45).occupied() && Main.heldItem.getLore().equals(Main.inventoryCells.get(45).getItemInSlot().getLore())) {
-                    Main.heldItem.setAmount(Main.heldItem.getAmount() + Main.inventoryCells.get(45).getItemInSlot().getAmount());
+                if (Main.max.inventory.isOccupied(45) && Main.heldItem.getLore().equals(Main.max.inventory.getItemInSlot(45).getLore())) {
+                    Main.heldItem.setAmount(Main.heldItem.getAmount() + Main.max.inventory.getItemInSlot(45).getAmount());
                     Main.decrementCraftingSlots();
                     Main.craftingGridUpdated = true;
                 }
                 return;
             }
             //if that cell is empty then update it with the held item, then clear the held item
-            if (!Main.inventoryCells.get(bestPoint).occupied()) {
-                Main.inventoryCells.get(bestPoint).setItemInSlot(Main.heldItem);
-                Main.heldItem.move(Main.allSquareCenterCoords[bestPoint]);
+            if (!Main.max.inventory.isOccupied(bestPoint)) {
+                Main.max.inventory.setItemInSlot(bestPoint, Main.heldItem);
+                Main.heldItem.move(Main.max.inventory.getCenterCoords(bestPoint));
                 Main.heldItem = null;
             }
             //if the cell is occupied, AND the held item and item occupying the slot are the same, just add the stack sizes (if stackable)
-            else if (Main.inventoryCells.get(bestPoint).occupied() && (Main.inventoryCells.get(bestPoint).getItemInSlot().getLore().equals(Main.heldItem.getLore())) && Main.heldItem.isStackable()) {
+            else if (Main.max.inventory.isOccupied(bestPoint) && (Main.max.inventory.getItemInSlot(bestPoint).getLore().equals(Main.heldItem.getLore())) && Main.heldItem.isStackable()) {
                 //if adding the two would make the stack >64, set the slot to 64 and hand to leftover
-                if (Main.heldItem.getAmount() + Main.inventoryCells.get(bestPoint).getItemInSlot().getAmount() > 64) {
-                    Main.heldItem.setAmount((Main.inventoryCells.get(bestPoint).getItemInSlot().getAmount() + Main.heldItem.getAmount()) - 64);
-                    Main.inventoryCells.get(bestPoint).getItemInSlot().setAmount(64);
+                if (Main.heldItem.getAmount() + Main.max.inventory.getItemInSlot(bestPoint).getAmount() > 64) {
+                    Main.heldItem.setAmount((Main.max.inventory.getItemInSlot(bestPoint).getAmount() + Main.heldItem.getAmount()) - 64);
+                    Main.max.inventory.getItemInSlot(bestPoint).setAmount(64);
                 } else {
-                    Main.inventoryCells.get(bestPoint).getItemInSlot().setAmount(Main.inventoryCells.get(bestPoint).getItemInSlot().getAmount() + Main.heldItem.getAmount());
+                    Main.max.inventory.getItemInSlot(bestPoint).setAmount(Main.max.inventory.getItemInSlot(bestPoint).getAmount() + Main.heldItem.getAmount());
                     Main.heldItem = null;
                 }
             }
             //finally if its just occupied and not the same (stackable) swap them
-            else if (Main.inventoryCells.get(bestPoint).occupied() && !Main.inventoryCells.get(bestPoint).getItemInSlot().getLore().equals(Main.heldItem.getLore())) {
+            else if (Main.max.inventory.isOccupied(bestPoint) && !Main.max.inventory.getItemInSlot(bestPoint).getLore().equals(Main.heldItem.getLore())) {
                 Item temp = Main.heldItem.clone();
-                Main.heldItem = Main.inventoryCells.get(bestPoint).getItemInSlot();
-                Main.inventoryCells.get(bestPoint).setItemInSlot(temp);
-                Main.inventoryCells.get(bestPoint).getItemInSlot().move(Main.inventoryCells.get(bestPoint).getCenterCoords());
+                Main.heldItem = Main.max.inventory.getItemInSlot(bestPoint);
+                Main.max.inventory.setItemInSlot(bestPoint, temp);
+                Main.max.inventory.getItemInSlot(bestPoint).move(Main.max.inventory.getCenterCoords(bestPoint));
             }
         }
     }
@@ -198,8 +194,8 @@ public class MouseHandling implements MouseListener, MouseMotionListener {
     private int findNearestCell(int[] coords) {
         double bestDistance = Integer.MAX_VALUE;
         int bestPoint = -1;
-        for (int i = 0; i < Main.inventoryCells.size(); i++) {
-            double temp = computeSquaredDistance(Main.inventoryCells.get(i).getCenterCoords(), coords);
+        for (int i = 0; i < Main.max.inventory.size(); i++) {
+            double temp = computeSquaredDistance(Main.max.inventory.getCenterCoords(i), coords);
             if (temp < bestDistance) {
                 bestDistance = temp;
                 bestPoint = i;
