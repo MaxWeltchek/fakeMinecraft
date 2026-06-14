@@ -1,15 +1,16 @@
 package minecraftclone.world;
 
-import minecraftclone.Main;
+import minecraftclone.logging.LogHeaderType;
 import minecraftclone.logging.LogEntry;
+import minecraftclone.logging.Logger;
 import minecraftclone.rendering.Points;
 
 import java.io.IOException;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class WorldBuilder {
+    private final static String NAME = "WORLDBUILDER";
 
     public WorldBuilder() {
         Random random = new Random();
@@ -30,7 +31,7 @@ public class WorldBuilder {
     }
 
     public ArrayList<Cube> flatWorld() throws IOException {
-        Main.logger.writeLog(new LogEntry("WORLDBUILDER", "Flat world creation started"));
+        Logger.writeLog(new LogEntry(NAME, LogHeaderType.INFO, "Flat world creation started"));
         ArrayList<Cube> cubes = new ArrayList<>();
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < 10; i++) {
@@ -38,7 +39,7 @@ public class WorldBuilder {
                 cubes.add(new Cube(new Points(i*10, -7, j*10), 5));
             }
         }
-        Main.logger.writeLog(new LogEntry("WORLDBUILDER", "Flat world generated (" + (System.currentTimeMillis() - startTime) + "ms)"));
+        Logger.writeLog(new LogEntry(NAME, LogHeaderType.INFO, "Flat world generated (" + (System.currentTimeMillis() - startTime) + "ms)"));
         return cubes;
     }
 }

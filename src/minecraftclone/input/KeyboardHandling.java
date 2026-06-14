@@ -1,13 +1,15 @@
 package minecraftclone.input;
 
 import minecraftclone.Main;
+import minecraftclone.logging.LogHeaderType;
 import minecraftclone.logging.LogEntry;
+import minecraftclone.logging.Logger;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
 
 public class KeyboardHandling implements KeyListener {
+    private final static String NAME = "KEYBOARDHANDLING";
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -32,11 +34,7 @@ public class KeyboardHandling implements KeyListener {
             Main.panicFlag = !Main.panicFlag;
         } else if (e.getKeyChar() == 'e') {
             Main.inFocus = (Main.inFocus + 1) % Main.numScreens;
-            try {
-                Main.logger.writeLog(new LogEntry("SYSTEM/INFO", "In Focus Switched: " + ((Main.inFocus == 1) ? "World" : "Inventory")));
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            Logger.writeLog(new LogEntry(NAME, LogHeaderType.UPDATE, "In Focus Switched: " + ((Main.inFocus == 1) ? "World" : "Inventory")));
         }
         //rotation debug
         else if (e.getKeyChar() == 't') {
