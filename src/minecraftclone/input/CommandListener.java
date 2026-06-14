@@ -168,6 +168,7 @@ public class CommandListener {
         System.out.println("/clear [item]");
         System.out.println("/movecamera (up/down) [distance]");
         System.out.println("/resetcamera");
+        System.out.println("/whatitem [slot]");
     }
 
     private void addRecipe(String regex) throws NoItemFoundException, IOException {
