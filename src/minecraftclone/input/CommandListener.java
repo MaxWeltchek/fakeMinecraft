@@ -128,7 +128,13 @@ public class CommandListener {
                             temp = new StringBuilder(temp.substring(0, temp.length() - 1));
                             throw new InvalidCommand("Extraneous Parameter At \"..." + temp + "\"");
                         }
-                    } else {
+                    } else if (parsedInput[0].equals("/whatitem")){
+                        if (parsedInput.length != 2) {
+                            throw new InvalidCommand("Missing or Extra parameter");
+                        }
+                        System.out.println(Main.max.inventory.getItemInSlot(Integer.parseInt(parsedInput[1])));
+                    }
+                    else {
                         throw new InvalidCommand();
                     }
                 } catch (InvalidCommand | NoItemFoundException | InventoryFullException e) {
