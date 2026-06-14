@@ -28,6 +28,10 @@ public class Item {
         stackable = stackable_;
     }
 
+    public String toString() {
+        return lore;
+    }
+
     //clone object instead of make pointer
     public Item clone() {
         return new Item(lore, sprite, centerCoords.clone(), amount, stackable);

@@ -1,10 +1,8 @@
 package minecraftclone.input;
 
 import minecraftclone.Main;
-import minecraftclone.inventory.InventoryCell;
 import minecraftclone.logging.LogEntry;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
@@ -20,9 +18,9 @@ public class KeyboardHandling implements KeyListener {
     public void keyPressed(KeyEvent e) {
         //8 is backspace, then delete slot
         if (e.getKeyCode() == 8) {
-            for (InventoryCell cell : Main.inventoryCells) {
-                if (Main.mouseCoords[0] > cell.getCenterCoords()[0] - Main.itemDimension / 2 && Main.mouseCoords[0] < cell.getCenterCoords()[0] + Main.itemDimension / 2 && Main.mouseCoords[1] > cell.getCenterCoords()[1] - Main.itemDimension / 2 && Main.mouseCoords[1] < cell.getCenterCoords()[1] + Main.itemDimension / 2) {
-                    cell.clearSlot();
+            for (int i = 0; i < Main.max.inventory.size(); i++) {
+                if (Main.mouseCoords[0] > Main.max.inventory.getCenterCoords(i)[0] - Main.itemDimension / 2 && Main.mouseCoords[0] < Main.max.inventory.getCenterCoords(i)[0] + Main.itemDimension / 2 && Main.mouseCoords[1] > Main.max.inventory.getCenterCoords(i)[1] - Main.itemDimension / 2 && Main.mouseCoords[1] < Main.max.inventory.getCenterCoords(i)[1] + Main.itemDimension / 2) {
+                    Main.max.inventory.clearSlot(i);
                     break;
                 }
             }
