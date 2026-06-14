@@ -1,3 +1,9 @@
+package minecraftclone.rendering;
+
+import minecraftclone.Main;
+import minecraftclone.inventory.NoItemFoundException;
+import minecraftclone.logging.LogEntry;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.IOException;
@@ -8,7 +14,7 @@ public class SpriteLoader {
     //generate image based on lore from sprite, 80x80 pixels
     public static Image generate(String lore) throws IOException {
         Main.logger.writeLog(new LogEntry("SPRITELOADER/INFO", "Attempting to load sprite \"" + lore + "\""));
-        try (InputStream is = SpriteLoader.class.getResourceAsStream("resources/" + lore + ".png")) {
+        try (InputStream is = SpriteLoader.class.getResourceAsStream("/resources/" + lore + ".png")) {
             if (is == null) {
                 throw new NoItemFoundException("Item not found: " + lore);
             }
@@ -23,13 +29,13 @@ public class SpriteLoader {
     }
 
     public static boolean exists(String lore) {
-        return SpriteLoader.class.getResource("resources/" + lore + ".png") != null;
+        return SpriteLoader.class.getResource("/resources/" + lore + ".png") != null;
     }
 
     //generate the crafting inventory
     public static Image generateCraftingInventory() throws IOException {
         Main.logger.writeLog(new LogEntry("SPRITELOADER/INFO", "Attempting to load sprite \"Crafting Inventory\""));
-        try (InputStream is = SpriteLoader.class.getResourceAsStream("resources/crafting_table.png")) {
+        try (InputStream is = SpriteLoader.class.getResourceAsStream("/resources/crafting_table.png")) {
             if (is == null) {
                 Main.logger.writeLog(new LogEntry("SPRITELOADER/INFO", "Resource Not Found \"Crafting Inventory\""));
                 throw new RuntimeException("Resource not found: " + "crafting table");
@@ -43,7 +49,7 @@ public class SpriteLoader {
     }
 
     public static Image generateInventory() {
-        try (InputStream is = SpriteLoader.class.getResourceAsStream("resources/" + "inventory" + ".png")) {
+        try (InputStream is = SpriteLoader.class.getResourceAsStream("/resources/" + "inventory" + ".png")) {
             if (is == null) {
                 throw new RuntimeException("Resource not found: " + "inventory");
             }
@@ -54,4 +60,3 @@ public class SpriteLoader {
         }
     }
 }
-

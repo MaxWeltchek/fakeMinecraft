@@ -1,3 +1,5 @@
+package minecraftclone.rendering;
+
 public class Shapes {
     private Points[] vertices;
     public Shapes(Points[] vertices_) {

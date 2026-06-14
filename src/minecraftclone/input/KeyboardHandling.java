@@ -1,3 +1,9 @@
+package minecraftclone.input;
+
+import minecraftclone.Main;
+import minecraftclone.inventory.InventoryCell;
+import minecraftclone.logging.LogEntry;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

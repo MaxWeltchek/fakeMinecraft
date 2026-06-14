@@ -1,3 +1,5 @@
+package minecraftclone.logging;
+
 public class LogEntry {
     private final long time;
     private final String header;

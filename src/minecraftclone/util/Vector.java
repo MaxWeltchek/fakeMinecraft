@@ -1,3 +1,5 @@
+package minecraftclone.util;
+
 import java.util.ArrayList;
 
 public class Vector {

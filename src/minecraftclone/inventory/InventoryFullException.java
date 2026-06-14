@@ -1,3 +1,5 @@
+package minecraftclone.inventory;
+
 public class InventoryFullException extends RuntimeException {
     public InventoryFullException(String message) {
         super(message);

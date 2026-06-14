@@ -1,3 +1,7 @@
+package minecraftclone.crafting;
+
+import minecraftclone.inventory.ItemRegistry;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;

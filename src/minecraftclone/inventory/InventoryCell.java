@@ -1,3 +1,5 @@
+package minecraftclone.inventory;
+
 public class InventoryCell {
     private final int[] centerCoords;
     private Item itemInSlot;

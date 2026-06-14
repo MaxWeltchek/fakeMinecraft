@@ -1,3 +1,5 @@
+package minecraftclone.rendering;
+
 import java.util.Arrays;
 
 public class Mesh {

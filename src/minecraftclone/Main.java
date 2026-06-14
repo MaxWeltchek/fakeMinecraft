@@ -1,3 +1,25 @@
+package minecraftclone;
+
+import minecraftclone.crafting.RecipeList;
+import minecraftclone.input.CommandListener;
+import minecraftclone.input.Input;
+import minecraftclone.input.KeyboardHandling;
+import minecraftclone.input.MouseHandling;
+import minecraftclone.inventory.InventoryCell;
+import minecraftclone.inventory.InventoryFullException;
+import minecraftclone.inventory.Item;
+import minecraftclone.inventory.ItemRegistry;
+import minecraftclone.logging.LogEntry;
+import minecraftclone.logging.Logger;
+import minecraftclone.rendering.Camera;
+import minecraftclone.rendering.Grid;
+import minecraftclone.rendering.Mesh;
+import minecraftclone.rendering.Points;
+import minecraftclone.rendering.SpriteLoader;
+import minecraftclone.util.Vector;
+import minecraftclone.world.Cube;
+import minecraftclone.world.WorldBuilder;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -149,25 +171,6 @@ public class Main {
                 {1, 2, 4, 3}
         };
 
-        Points[] gridVertices = {
-                new Points(-100, -60, -100),
-                new Points(-100, -60, 0),
-                new Points(-100, -60, 100),
-                new Points(0, -60, -100),
-                new Points(0, -60, 0),
-                new Points(0, -60, 100),
-                new Points(100, -60, -100),
-                new Points(100, -60, 0),
-                new Points(100, -60, 100)
-        };
-
-        int[][] gridFaces = {
-                {0, 1, 4, 3},
-                {3, 4, 7, 6},
-                {1, 2, 5, 4},
-                {4, 5, 8, 7}
-        };
-
         cube = new Mesh(cubeVertices, cubeFaces);
         pyramid = new Mesh(pyramidVertices, pyramidFaces);
         groundGrid = new Grid(1000, -100, 50);
@@ -236,7 +239,7 @@ public class Main {
     public static void frameTick() throws IOException, FontFormatException {
 
         Graphics pen = bs.getDrawGraphics();
-        pen.setFont(Font.createFont(Font.PLAIN, Objects.requireNonNull(Main.class.getResourceAsStream("resources/minecraft.ttf"))).deriveFont(18f));
+        pen.setFont(Font.createFont(Font.PLAIN, Objects.requireNonNull(Main.class.getResourceAsStream("/resources/minecraft.ttf"))).deriveFont(18f));
         {
 
             //crafting grid loop

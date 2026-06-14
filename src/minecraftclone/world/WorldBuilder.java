@@ -1,3 +1,9 @@
+package minecraftclone.world;
+
+import minecraftclone.Main;
+import minecraftclone.logging.LogEntry;
+import minecraftclone.rendering.Points;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;

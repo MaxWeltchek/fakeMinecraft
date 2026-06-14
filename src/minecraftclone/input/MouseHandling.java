@@ -1,3 +1,10 @@
+package minecraftclone.input;
+
+import minecraftclone.Main;
+import minecraftclone.inventory.InventoryCell;
+import minecraftclone.inventory.Item;
+import minecraftclone.rendering.Camera;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;

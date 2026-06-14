@@ -1,3 +1,8 @@
+package minecraftclone.rendering;
+
+import minecraftclone.Main;
+import minecraftclone.util.Vector;
+
 import java.io.IOException;
 import java.util.Arrays;
 

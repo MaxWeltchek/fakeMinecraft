@@ -1,3 +1,7 @@
+package minecraftclone.inventory;
+
+import minecraftclone.rendering.SpriteLoader;
+
 import java.awt.*;
 import java.io.IOException;
 

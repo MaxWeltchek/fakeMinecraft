@@ -1,3 +1,5 @@
+package minecraftclone.input;
+
 public class Input {
     private String action;
     private String lore;

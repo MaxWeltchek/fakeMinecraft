@@ -1,3 +1,5 @@
+package minecraftclone.rendering;
+
 public class Points {
     public static final double NEAR_CLIP_Z = 0.01;
     //contains xyz coordinates for a given point

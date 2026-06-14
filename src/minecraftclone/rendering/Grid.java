@@ -1,3 +1,5 @@
+package minecraftclone.rendering;
+
 import java.util.ArrayList;
 public class Grid {
     private Points[][] vertices;

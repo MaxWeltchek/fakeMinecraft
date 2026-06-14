@@ -1,3 +1,9 @@
+package minecraftclone.world;
+
+import minecraftclone.rendering.Mesh;
+import minecraftclone.rendering.Points;
+import minecraftclone.rendering.Shapes;
+
 public class Cube extends Shapes{
     private final int[][] faces;
     private final Mesh mesh;

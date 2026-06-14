@@ -1,3 +1,5 @@
+package minecraftclone.crafting;
+
 import java.util.Arrays;
 
 public class Recipe {
