@@ -212,10 +212,9 @@ public class Inventory {
                 getItemInSlot(cell2).setAmount(sum);
                 clearSlot(cell1);
             } else {
-                int diff = (64 - getItemInSlot(cell2).getAmount());
-                setItemInSlot(cell2, getItemInSlot(cell1));
+                int transferAmount = 64 - getItemInSlot(cell2).getAmount();
+                getItemInSlot(cell1).setAmount(getItemInSlot(cell1).getAmount() - transferAmount);
                 getItemInSlot(cell2).setAmount(64);
-                getItemInSlot(cell1).setAmount(diff);
             }
         }
     }
