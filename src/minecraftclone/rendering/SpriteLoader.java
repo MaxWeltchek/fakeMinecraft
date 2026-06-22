@@ -1,8 +1,9 @@
 package minecraftclone.rendering;
 
-import minecraftclone.Main;
 import minecraftclone.inventory.NoItemFoundException;
+import minecraftclone.logging.LogHeaderType;
 import minecraftclone.logging.LogEntry;
+import minecraftclone.logging.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -10,20 +11,21 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class SpriteLoader {
+    private final static String NAME = "SPRITELOADER";
 
     //generate image based on lore from sprite, 80x80 pixels
     public static Image generate(String lore) throws IOException {
-        Main.logger.writeLog(new LogEntry("SPRITELOADER/INFO", "Attempting to load sprite \"" + lore + "\""));
+        Logger.writeLog(new LogEntry(NAME, LogHeaderType.INFO, "Attempting to load sprite \"" + lore + "\""));
         try (InputStream is = SpriteLoader.class.getResourceAsStream("/resources/" + lore + ".png")) {
             if (is == null) {
                 throw new NoItemFoundException("Item not found: " + lore);
             }
 
-            Main.logger.writeLog(new LogEntry("SPRITELOADER/INFO", "Loaded sprite \"" + lore + "\""));
+            Logger.writeLog(new LogEntry(NAME, LogHeaderType.INFO, "Loaded sprite \"" + lore + "\""));
             return ImageIO.read(is).getScaledInstance(80,80, 2);
         } catch (IOException e) {
-            Main.logger.writeLog(new LogEntry("SPRITELOADER/INFO", "[ERROR] Failed to load sprite \"" + lore + "\""));
-            Main.logger.writeLog(new LogEntry("SPRITELOADER/INFO", "[ERROR CODE] " + e.getMessage()));
+            Logger.writeLog(new LogEntry(NAME, LogHeaderType.ERROR, "Failed to load sprite \"" + lore + "\""));
+            Logger.writeLog(new LogEntry(NAME, LogHeaderType.ERROR, "Error code: " + e.getMessage()));
             throw new RuntimeException(e);
         }
     }
@@ -34,14 +36,14 @@ public class SpriteLoader {
 
     //generate the crafting inventory
     public static Image generateCraftingInventory() throws IOException {
-        Main.logger.writeLog(new LogEntry("SPRITELOADER/INFO", "Attempting to load sprite \"Crafting Inventory\""));
+        Logger.writeLog(new LogEntry(NAME, LogHeaderType.INFO, "Attempting to load sprite \"Crafting Inventory\""));
         try (InputStream is = SpriteLoader.class.getResourceAsStream("/resources/crafting_table.png")) {
             if (is == null) {
-                Main.logger.writeLog(new LogEntry("SPRITELOADER/INFO", "Resource Not Found \"Crafting Inventory\""));
+                Logger.writeLog(new LogEntry(NAME, LogHeaderType.ERROR, "Resource Not Found \"Crafting Inventory\""));
                 throw new RuntimeException("Resource not found: " + "crafting table");
             }
 
-            Main.logger.writeLog(new LogEntry("SPRITELOADER/INFO", "Loaded Sprite \"Crafting Inventory\""));
+            Logger.writeLog(new LogEntry(NAME, LogHeaderType.INFO, "Loaded Sprite \"Crafting Inventory\""));
             return ImageIO.read(is).getScaledInstance(880,830, 2);
         } catch (IOException e) {
             throw new RuntimeException(e);

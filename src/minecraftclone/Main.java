@@ -8,6 +8,7 @@ import minecraftclone.input.MouseHandling;
 import minecraftclone.inventory.InventoryFullException;
 import minecraftclone.inventory.Item;
 import minecraftclone.inventory.ItemRegistry;
+import minecraftclone.logging.LogHeaderType;
 import minecraftclone.logging.LogEntry;
 import minecraftclone.logging.Logger;
 import minecraftclone.player.Player;
@@ -31,6 +32,7 @@ import java.util.concurrent.*;
 
 
 public class Main {
+    private final static String NAME = "MAIN";
     //stuff for canvas
     public static Canvas canvas;
     public static BufferStrategy bs;
@@ -60,7 +62,6 @@ public class Main {
     public static int frameCount = 0;
     public static final long bootTime = System.currentTimeMillis();
     private static long lastFrameTime;
-    public static Logger logger = new Logger();
     public static ConcurrentLinkedQueue<Input> interactions = new ConcurrentLinkedQueue<>();
     public static MouseHandling mouseListener = new MouseHandling();
     public static KeyboardHandling keyListener = new KeyboardHandling();
@@ -164,17 +165,12 @@ public class Main {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             ArrayList<LogEntry> entries = new ArrayList<>();
-            entries.add(new LogEntry("SYSTEM/INFO", "Runtime Statistics: Frame Count (" + frameCount + ")"));
-            entries.add(new LogEntry("SYSTEM/INFO", "Runtime Statistics: Uptime (" + formatTime(System.currentTimeMillis()- bootTime) + ")"));
-            entries.add(new LogEntry("SYSTEM/INFO", "Runtime Statistics: Average Frame Rate: " + frameCount/((System.currentTimeMillis() - bootTime)/1000.0)));
-            entries.add(new LogEntry("SYSTEM/INFO", "Shutting down..."));
-            for (LogEntry entry : entries) {
-                try {
-                    logger.writeLog(entry);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            entries.add(new LogEntry(NAME, LogHeaderType.INFO, "Runtime Statistics: Frame Count (" + frameCount + ")"));
+            entries.add(new LogEntry(NAME, LogHeaderType.INFO, "Runtime Statistics: Uptime (" + formatTime(System.currentTimeMillis()- bootTime) + ")"));
+            entries.add(new LogEntry(NAME, LogHeaderType.INFO, "Runtime Statistics: Average Frame Rate: " + frameCount/((System.currentTimeMillis() - bootTime)/1000.0)));
+            entries.add(new LogEntry(NAME, LogHeaderType.INFO, "Shutting down..."));
+            Logger.writeLogs(entries);
+            Logger.shutdown();
         }));
 
         //load items
@@ -188,7 +184,7 @@ public class Main {
         max.inventory.setItemInSlot(7, new Item("iron_block", max.inventory.getCenterCoords(7), 1, true));
 
         //make world
-        worldBuilder.flatWorld(blocks);
+        blocks = worldBuilder.flatWorld();
 
         //setup command listener
         CommandListener commandListener = new CommandListener();
@@ -200,11 +196,7 @@ public class Main {
             try {
                 Main.frameTick();
             } catch (IOException | FontFormatException e) {
-                try {
-                    logger.writeLog(new LogEntry("SYSTEM/INFO", "FATAL: An unknown error occurred"));
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+                Logger.writeLog(new LogEntry(NAME, LogHeaderType.ERROR, "FATAL: An unknown error occurred"));
             }
         }, 0, 14, TimeUnit.MILLISECONDS);
         Thread.sleep(Integer.MAX_VALUE);
@@ -424,7 +416,7 @@ public class Main {
         if (itemsLeftToGrant > 0) { //if not all were given (inv full), say how many were given
             throw new InventoryFullException(item, quantity - itemsLeftToGrant);
         } else {
-            logger.writeLog(new LogEntry("INTERACTIONS/INFO", "Gave " + quantity + " " + item.split("_")[0] + (item.split("_").length > 1 ? " " + item.split("_")[1] : "") + (quantity > 1 ? "s" : "")));
+            Logger.writeLog(new LogEntry(NAME, LogHeaderType.INFO, "Gave " + quantity + " " + item.split("_")[0] + (item.split("_").length > 1 ? " " + item.split("_")[1] : "") + (quantity > 1 ? "s" : "")));
             System.out.println("Gave " + quantity + " " + item.split("_")[0] + (item.split("_").length > 1 ? " " + item.split("_")[1] : "") + (quantity > 1 ? "s" : ""));
         }
     }
@@ -440,7 +432,7 @@ public class Main {
             }
             //send cleared message
             System.out.println("Cleared " + amountOfItemsCleared + " item" + (amountOfItemsCleared != 1 ? "s" : ""));
-            logger.writeLog(new LogEntry("INTERACTIONS/INFO", "Cleared " + amountOfItemsCleared + " item" + (amountOfItemsCleared != 1 ? "s" : "")));
+            Logger.writeLog(new LogEntry(NAME, LogHeaderType.INFO, "Cleared " + amountOfItemsCleared + " item" + (amountOfItemsCleared != 1 ? "s" : "")));
         } else {
             int amountOfItemsCleared = 0;
             for (int i = 0; i < 36; i++) {

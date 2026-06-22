@@ -5,7 +5,9 @@ import minecraftclone.crafting.Recipe;
 import minecraftclone.crafting.RecipeList;
 import minecraftclone.inventory.InventoryFullException;
 import minecraftclone.inventory.NoItemFoundException;
+import minecraftclone.logging.LogHeaderType;
 import minecraftclone.logging.LogEntry;
+import minecraftclone.logging.Logger;
 import minecraftclone.rendering.Camera;
 import minecraftclone.rendering.SpriteLoader;
 import minecraftclone.util.Vector;
@@ -20,6 +22,7 @@ import java.nio.file.StandardOpenOption;
 
 
 public class CommandListener {
+    private final static String NAME = "COMMANDLISTENER";
     private volatile boolean running = false;
     private Thread listenerThread;
     public void start() throws InvalidCommand{
@@ -32,7 +35,7 @@ public class CommandListener {
                 try {
                     String input = scanner.nextLine();
                     String[] parsedInput = input.split(" ");
-                    Main.logger.writeLog(new LogEntry("COMMANDLISTENER/INFO", "input: \"" + input + "\""));
+                    Logger.writeLog(new LogEntry(NAME, LogHeaderType.INFO, "input: \"" + input + "\""));
 
                     if (parsedInput[0].equals("/give")) {
                         if (parsedInput.length == 1) {
@@ -87,7 +90,7 @@ public class CommandListener {
                                 } else {
                                     Camera.updatePosition(new Vector(0, -30, 0));
                                 }
-                                Main.logger.writeLog(new LogEntry("CAMERA/INFO", "Position updated, " + Arrays.toString(Camera.getCoordinates())));
+                                Logger.writeLog(new LogEntry(NAME, LogHeaderType.UPDATE, "Position updated, " + Arrays.toString(Camera.getCoordinates())));
                             } else {
                                 try {
                                     Integer.parseInt(parsedInput[1]);
@@ -139,11 +142,7 @@ public class CommandListener {
                     }
                 } catch (InvalidCommand | NoItemFoundException | InventoryFullException e) {
                     System.out.println(e.getMessage());
-                    try {
-                        Main.logger.writeLog(new LogEntry("COMMANDLISTENER/ERROR", e.getMessage()));
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
+                    Logger.writeLog(new LogEntry(NAME, LogHeaderType.ERROR, e.getMessage()));
                 } catch (Exception e) {
                     System.out.println("Command failed " + e.getMessage());
                 }

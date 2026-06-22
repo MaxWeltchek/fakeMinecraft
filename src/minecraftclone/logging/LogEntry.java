@@ -5,9 +5,9 @@ public class LogEntry {
     private final String header;
     private final String contents;
 
-    public LogEntry(String header_, String contents_) {
+    public LogEntry(String name, LogHeaderType type, String contents_) {
         time = System.currentTimeMillis();
-        header = header_;
+        header = name + "/" + type;
         contents = contents_;
     }
 
